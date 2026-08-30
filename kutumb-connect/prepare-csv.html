@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prepare your CSV — Kutumb Connect</title>
+    <link rel="stylesheet" href="../assets/style.css" />
+  </head>
+  <body>
+    <div class="umbrella">
+      <div class="bar">
+        <a class="org" href="../index.html">◇ Setunex</a>
+        <span class="crumb">Kutumb Connect</span>
+      </div>
+    </div>
+    <header class="site">
+      <div class="bar">
+        <a class="brand" href="index.html">Kutumb Connect</a>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="prepare-csv.html" class="active">Prepare your CSV</a>
+          <a href="privacy-faq.html">Privacy &amp; FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <h1>Prepare your CSV</h1>
+      <p class="lede">
+        Three identity columns make the import behave correctly. Get these right
+        once, and every future update just works.
+      </p>
+
+      <h2>The three identity columns</h2>
+      <table>
+        <tr>
+          <th>Column</th>
+          <th>Scope</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td><code>CommunityCode</code></td>
+          <td>Whole file</td>
+          <td>
+            Which community this data belongs to. Re-importing the same code
+            <strong>upgrades</strong> that community; a different code is added
+            alongside it, never overwriting it.
+          </td>
+        </tr>
+        <tr>
+          <td><code>RegionCode</code></td>
+          <td>Whole file (optional)</td>
+          <td>
+            Sub-partition for large communities split by district/state. Leave
+            blank if your community is imported as one file.
+          </td>
+        </tr>
+        <tr>
+          <td><code>FamilyId</code></td>
+          <td>One family</td>
+          <td>
+            Permanent ID for a family, stable across re-exports. Shown to family
+            members in-app so they can quote it when requesting an update.
+          </td>
+        </tr>
+      </table>
+
+      <div class="callout danger">
+        Never change <code>CommunityCode</code> once you've imported with it —
+        the app has no other way to know two files are the same community, and a
+        changed code is treated as a brand new one.
+      </div>
+
+      <h2 id="sample">What your CSV looks like</h2>
+      <p>
+        A CSV is just a grid, one row per person. Here's the app's real demo
+        dataset opened as a spreadsheet — one family, 5 rows. All 5 members
+        share <strong>CommunityCode</strong>, <strong>RegionCode</strong> and
+        <strong>FamilyId</strong> (highlighted) — everything else varies per
+        person.
+      </p>
+
+      <div class="cta-row">
+        <a class="cta" href="../assets/sample-contacts.csv" download>
+          ⭳ Download the full sample CSV (90 rows, 18 families)
+        </a>
+      </div>
+
+      <div class="excel">
+        <div class="excel-toolbar">
+          <span class="dot"></span><span class="dot"></span
+          ><span class="dot"></span>
+          sample-contacts.csv — Sheet1
+        </div>
+        <div class="excel-scroll">
+          <table>
+            <thead>
+              <tr class="colletters">
+                <th class="rownum"></th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+                <th>D</th>
+                <th>E</th>
+                <th>F</th>
+                <th>G</th>
+                <th>H</th>
+                <th>I</th>
+                <th>J</th>
+              </tr>
+              <tr class="headers">
+                <th class="rownum">#</th>
+                <th>CommunityCode</th>
+                <th>RegionCode</th>
+                <th>FamilyId</th>
+                <th>FirstName</th>
+                <th>Surname</th>
+                <th>Relationship</th>
+                <th>Gender</th>
+                <th>BirthYear</th>
+                <th>Occupation</th>
+                <th>City</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="rownum">1</td>
+                <td class="key">DEMO</td>
+                <td class="key">GJ</td>
+                <td class="key">GJ-F1</td>
+                <td>Rohan</td>
+                <td>Sharma</td>
+                <td>Grandfather</td>
+                <td>Male</td>
+                <td>1954</td>
+                <td>Retired</td>
+                <td>Ahmedabad</td>
+              </tr>
+              <tr>
+                <td class="rownum">2</td>
+                <td class="key">DEMO</td>
+                <td class="key">GJ</td>
+                <td class="key">GJ-F1</td>
+                <td>Vivek</td>
+                <td>Sharma</td>
+                <td>Self</td>
+                <td>Male</td>
+                <td>1978</td>
+                <td>Job</td>
+                <td>Ahmedabad</td>
+              </tr>
+              <tr>
+                <td class="rownum">3</td>
+                <td class="key">DEMO</td>
+                <td class="key">GJ</td>
+                <td class="key">GJ-F1</td>
+                <td>Riya</td>
+                <td>Sharma</td>
+                <td>Wife</td>
+                <td>Female</td>
+                <td>1982</td>
+                <td>Homemaker</td>
+                <td>Ahmedabad</td>
+              </tr>
+              <tr>
+                <td class="rownum">4</td>
+                <td class="key">DEMO</td>
+                <td class="key">GJ</td>
+                <td class="key">GJ-F1</td>
+                <td>Neha</td>
+                <td>Sharma</td>
+                <td>Daughter</td>
+                <td>Female</td>
+                <td>2005</td>
+                <td>Student</td>
+                <td>Ahmedabad</td>
+              </tr>
+              <tr>
+                <td class="rownum">5</td>
+                <td class="key">DEMO</td>
+                <td class="key">GJ</td>
+                <td class="key">GJ-F1</td>
+                <td>Paresh</td>
+                <td>Sharma</td>
+                <td>Son</td>
+                <td>Male</td>
+                <td>2011</td>
+                <td>Student</td>
+                <td>Ahmedabad</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="callout">
+        This is exactly what the
+        <a href="#builder">Google Sheet builder</a> produces automatically from
+        a simple <code>Family#</code> column — you never type the highlighted
+        columns by hand.
+      </div>
+
+      <h2 id="builder">Option A — Google Sheet builder (recommended)</h2>
+      <p>
+        A ready-to-use Google Sheet + Apps Script computes
+        <code>CommunityCode</code>/<code>RegionCode</code>/<code>FamilyId</code>
+        for you from a simple <code>Family#</code> column, validates required
+        fields, and exports the CSV to your Drive.
+      </p>
+
+      <div class="cta-row">
+        <a
+          class="cta"
+          href="../assets/csv-builder/CommunityContactsExport.gs"
+          download
+        >
+          ⬇ Download the Apps Script (CommunityContactsExport.gs)
+        </a>
+        <a
+          class="cta"
+          href="../assets/csv-builder/directory-headers.csv"
+          download
+        >
+          ⬇ Download the header row (directory-headers.csv)
+        </a>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <span class="num">1</span>
+          <h4>Create the Sheet</h4>
+          <p>
+            New Google Sheet, two tabs: <code>Settings</code> and
+            <code>Directory</code>.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <h4>Set your identity once</h4>
+          <p>
+            Settings!B1 = <code>CommunityCode</code>, B2 = optional
+            <code>RegionCode</code>. Never changed again.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <h4>Paste the headers</h4>
+          <p>
+            Directory row 1 = the contents of the
+            <code>directory-headers.csv</code> download above.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">4</span>
+          <h4>Fill in your families</h4>
+          <p>
+            One row per person. Same <code>Family#</code> for every member of
+            one family.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">5</span>
+          <h4>Paste the script</h4>
+          <p>
+            Extensions ▸ Apps Script ▸ paste
+            <code>CommunityContactsExport.gs</code> ▸ Save ▸ reload.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">6</span>
+          <h4>Export</h4>
+          <p>
+            Menu <strong>Kutumb Connect ▸ Export CSV for import</strong> —
+            validates required fields and computes every ID for you.
+          </p>
+        </div>
+      </div>
+
+      <h2>Option B — Prepare the CSV by hand</h2>
+      <ol>
+        <li>
+          Start from the in-app template: Import Data ▸ "Download template CSV"
+          (works even before your first import — it uses the app's built-in
+          sample layout).
+        </li>
+        <li>
+          Fill one row per person. See the
+          <a href="#fields">full field reference</a> below for every column.
+        </li>
+        <li>
+          Put the same value in <code>CommunityCode</code> (and
+          <code>RegionCode</code>, if used) on every row.
+        </li>
+        <li>
+          Give every member of one family the same <code>FamilyId</code> (e.g.
+          <code>GJ-F007</code>) and keep it stable across future edits.
+        </li>
+      </ol>
+
+      <h2 id="fields">Full field reference</h2>
+      <p>
+        Column names are case-sensitive and must match exactly. Order doesn't
+        matter — the app matches by name. Blank cells are fine for any
+        "Optional" field.
+      </p>
+
+      <h3>Identity &amp; import behavior</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Required</th>
+            <th>Sensitivity</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>CommunityCode</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">None</span></td>
+            <td>Same value on every row. See the identity columns above.</td>
+          </tr>
+          <tr>
+            <td>RegionCode</td>
+            <td><span class="tag optional">Optional</span></td>
+            <td><span class="tag pii-low">None</span></td>
+            <td>Same value on every row if used.</td>
+          </tr>
+          <tr>
+            <td>FamilyId</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">None</span></td>
+            <td>Same value for every member of one family.</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Identity</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Required</th>
+            <th>Sensitivity</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>NamePrefix</td>
+            <td>Optional</td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td>Mr / Mrs / Ms / Dr, etc.</td>
+          </tr>
+          <tr>
+            <td>FirstName</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>MiddleName</td>
+            <td>Optional</td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Surname</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Gender</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td>Used for filters/charts.</td>
+          </tr>
+          <tr>
+            <td>Relationship</td>
+            <td><span class="tag required">Required</span></td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td>Self / Wife / Son / Daughter / Grandfather, etc.</td>
+          </tr>
+          <tr>
+            <td>MaritalStatus</td>
+            <td>Optional</td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>BirthYear</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td>Year only — no month/day. App computes Age from this.</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Contact (sensitive)</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Required</th>
+            <th>Sensitivity</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>ContactNumber1</td>
+            <td>Optional</td>
+            <td><span class="tag pii-high">High</span></td>
+            <td>Used for the login match and call/WhatsApp actions.</td>
+          </tr>
+          <tr>
+            <td>ContactNumber2</td>
+            <td>Optional</td>
+            <td><span class="tag pii-high">High</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>WhatsApp</td>
+            <td>Optional</td>
+            <td><span class="tag pii-high">High</span></td>
+            <td>Falls back to ContactNumber1 if blank.</td>
+          </tr>
+          <tr>
+            <td>EMail</td>
+            <td>Optional</td>
+            <td><span class="tag pii-high">High</span></td>
+            <td>Used for the login match.</td>
+          </tr>
+          <tr>
+            <td>LinkedIn / Facebook / Twitter</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td>
+              Full profile URL — see
+              <a href="privacy-faq.html">Privacy &amp; FAQ</a>.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Location (sensitive)</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Required</th>
+            <th>Sensitivity</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>AddressLine1 / 2 / 3</td>
+            <td>Optional</td>
+            <td><span class="tag pii-high">High</span></td>
+            <td>
+              Full postal address. Consider Area/City only if you don't need the
+              exact street.
+            </td>
+          </tr>
+          <tr>
+            <td>Pincode</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Area / City / State</td>
+            <td>Optional</td>
+            <td><span class="tag pii-low">Low</span></td>
+            <td>
+              Used for filters/dashboard; enough on their own for most
+              directories.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Lineage / cultural background</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Required</th>
+            <th>Sensitivity</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>Mosal</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td>Mother's ancestral village.</td>
+          </tr>
+          <tr>
+            <td>NativeVillage</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Kuldevi</td>
+            <td>Optional</td>
+            <td><span class="tag pii-med">Medium</span></td>
+            <td>
+              Family deity/lineage marker — get explicit comfort from families
+              first.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Education, work &amp; interests</h3>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Column</th>
+            <th>Notes</th>
+          </tr>
+          <tr>
+            <td>EducationDetails, HighestEducation, Specilization</td>
+            <td>Free text.</td>
+          </tr>
+          <tr>
+            <td>School, Board, HSSchool, HSBoard</td>
+            <td>Primary/secondary schooling.</td>
+          </tr>
+          <tr>
+            <td>UGCollege, UGUniversity, GCollege, GUniversity, GYear</td>
+            <td>Undergraduate.</td>
+          </tr>
+          <tr>
+            <td>PGCollege, PGUniversity, PGYear</td>
+            <td>Postgraduate.</td>
+          </tr>
+          <tr>
+            <td>DCollege, DUniversity</td>
+            <td>Doctorate.</td>
+          </tr>
+          <tr>
+            <td>MediumOfEducation</td>
+            <td>Free text.</td>
+          </tr>
+          <tr>
+            <td>Occupation</td>
+            <td>
+              Drives the Community page's category grouping
+              (Students/Jobs/Business/Retired).
+            </td>
+          </tr>
+          <tr>
+            <td>Sector, JobProfile</td>
+            <td>Free text.</td>
+          </tr>
+          <tr>
+            <td>Hobbies, Awards, HobbyInstruments</td>
+            <td>Free text.</td>
+          </tr>
+          <tr>
+            <td>CanShare</td>
+            <td>
+              Topics this person can mentor/guide others on — not a
+              privacy/consent flag.
+            </td>
+          </tr>
+          <tr>
+            <td>CommunityContribution, IndividualContribution</td>
+            <td>Free text.</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Multiple communities in one app install</h2>
+      <p>
+        One install can hold several communities at once — each import just
+        needs a different <code>CommunityCode</code>. Importing community B
+        never touches community A's data. The first time the app sees a new
+        <code>CommunityCode</code>, it asks you to name it (for confirmation
+        dialogs only — that name is never stored in your CSV).
+      </p>
+
+      <h2>Large communities split across districts/states</h2>
+      <p>
+        If your community has thousands of members across regions, keep one
+        spreadsheet <em>per region</em>, all sharing the same
+        <code>CommunityCode</code> but each with its own
+        <code>RegionCode</code> (e.g. <code>GJ</code>, <code>MH</code>). Each
+        region's admin can update and re-import independently — re-importing one
+        region only replaces that region, never the others.
+      </p>
+
+      <h2>Updating existing data</h2>
+      <p>
+        Edit your Sheet/CSV and export again with the same
+        <code>CommunityCode</code> + <code>RegionCode</code>. The app will show
+        a confirmation ("Replace 42 existing contacts for &lt;Community&gt; with
+        45 new ones?") before it replaces that data — it's always an explicit,
+        reversible-by-re-import action, never silent.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <span class="num">1</span>
+          <h4>Import the sample CSV</h4>
+          <p>
+            Import Data ▸ Choose CSV file ▸ pick the file you downloaded above.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">2</span>
+          <h4>Edit one cell</h4>
+          <p>
+            Change Rohan Sharma's Occupation. Keep CommunityCode = DEMO,
+            RegionCode = GJ.
+          </p>
+        </div>
+        <div class="step">
+          <span class="num">3</span>
+          <h4>Re-import it</h4>
+          <p>
+            You'll see a "replace existing data" confirmation with row counts —
+            never a silent overwrite.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site">
+      Kutumb Connect is a volunteer, offline-first community directory app. This
+      guide covers CSV preparation and import behavior only.
+      <div class="by">A <a href="../index.html">Setunex</a> product</div>
+    </footer>
+  </body>
+</html>

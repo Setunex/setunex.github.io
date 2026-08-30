@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy &amp; FAQ — Kutumb Connect</title>
+    <link rel="stylesheet" href="../assets/style.css" />
+  </head>
+  <body>
+    <div class="umbrella">
+      <div class="bar">
+        <a class="org" href="../index.html">◇ Setunex</a>
+        <span class="crumb">Kutumb Connect</span>
+      </div>
+    </div>
+    <header class="site">
+      <div class="bar">
+        <a class="brand" href="index.html">Kutumb Connect</a>
+        <nav>
+          <a href="index.html">Home</a>
+          <a href="prepare-csv.html">Prepare your CSV</a>
+          <a href="privacy-faq.html" class="active">Privacy &amp; FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <h1>Privacy &amp; FAQ</h1>
+      <p class="lede">
+        Built for data admins can trust with sensitive community details: no
+        server, no accounts, no analytics — only what you import, only on the
+        device you import it to.
+      </p>
+
+      <h2>Built-in security</h2>
+      <div class="features">
+        <div class="feature">
+          <span class="emoji">🔒</span>
+          <h4>Zero attack surface</h4>
+          <p>
+            No server, no account database — there's nothing centralized to
+            breach.
+          </p>
+        </div>
+        <div class="feature">
+          <span class="emoji">👁️</span>
+          <h4>Screenshot-blocked</h4>
+          <p>
+            The Android app blocks screenshots/screen recording and hides its
+            content in the recent-apps switcher.
+          </p>
+        </div>
+        <div class="feature">
+          <span class="emoji">☁️</span>
+          <h4>Excluded from backups</h4>
+          <p>
+            Not included in <code>adb backup</code> or automatic cloud backups —
+            imported data can't leave the device that way.
+          </p>
+        </div>
+        <div class="feature">
+          <span class="emoji">📅</span>
+          <h4>Minimal by default</h4>
+          <p>Only a birth year is collected, never a full date of birth.</p>
+        </div>
+        <div class="feature">
+          <span class="emoji">🗑️</span>
+          <h4>You're always in control</h4>
+          <p>
+            Clear every imported community's data on-device anytime, no support
+            ticket needed.
+          </p>
+        </div>
+      </div>
+
+      <h2>Security implementation</h2>
+      <p>
+        What's actually built, not just claimed — and what isn't, yet. Standards
+        referenced:
+        <a href="https://mas.owasp.org/MASVS/">OWASP MASVS</a> (Mobile
+        Application Security Verification Standard) and the
+        <a href="https://owasp.org/www-project-mobile-top-10/"
+          >OWASP Mobile Top 10</a
+        >.
+      </p>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Protection</th>
+            <th>Status</th>
+            <th>What it does</th>
+          </tr>
+          <tr>
+            <td>No server / no accounts</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Architecture-level: there is no backend at all, so there's no
+              server to breach, no account database to leak, no API to attack.
+              (MASVS-ARCH)
+            </td>
+          </tr>
+          <tr>
+            <td>Screenshot / screen-recording block</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Android <code>FLAG_SECURE</code> on the main window — blocks
+              screenshots and screen recording, and redacts the app's content
+              from the recent-apps switcher preview. (MASVS-STORAGE-1)
+            </td>
+          </tr>
+          <tr>
+            <td>Excluded from device/cloud backup</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              <code>android:allowBackup="false"</code> — imported contact data
+              can't be extracted via <code>adb backup</code> or carried off in
+              an automatic cloud backup. (MASVS-STORAGE-2)
+            </td>
+          </tr>
+          <tr>
+            <td>Network hardening</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Android Network Security Config blocks all cleartext (HTTP)
+              traffic and trusts only system CAs, not user-installed ones —
+              defense-in-depth even though the app makes no network calls of its
+              own. (MASVS-NETWORK-1/2)
+            </td>
+          </tr>
+          <tr>
+            <td>Content-Security-Policy</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Locks script/object/frame sources to the app itself (<code
+                >script-src 'self'</code
+              >, <code>object-src 'none'</code>,
+              <code>frame-ancestors 'none'</code>) — shrinks the blast radius of
+              any future injection bug. (OWASP ASVS V14, ~Mobile M7)
+            </td>
+          </tr>
+          <tr>
+            <td>Minimal data collection</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Only a birth <em>year</em> is collected, never a full date of
+              birth — smaller blast radius if data is ever exposed. (data
+              minimization principle)
+            </td>
+          </tr>
+          <tr>
+            <td>User-controlled data clearing</td>
+            <td><span class="tag optional">Implemented</span></td>
+            <td>
+              Import ▸ "Clear imported data" wipes every community's data from
+              that device immediately, no support request needed.
+            </td>
+          </tr>
+          <tr>
+            <td>At-rest encryption of stored contacts</td>
+            <td><span class="tag pii-med">Not yet</span></td>
+            <td>
+              Imported data sits in the OS's app-private storage (not encrypted
+              by the app itself). Real at-rest encryption needs an OS
+              Keystore-backed secure-storage plugin — planned, not shipped.
+              Until then: device-level screen lock + encryption (standard on
+              modern Android) is your actual protection at rest.
+              (MASVS-STORAGE-1)
+            </td>
+          </tr>
+          <tr>
+            <td>Login as an access-control boundary</td>
+            <td><span class="tag pii-med">By design, not a gate</span></td>
+            <td>
+              "Login" personalizes the experience (favorites, "you") — it does
+              not restrict who can browse the imported directory. This app is a
+              shared community directory, not a multi-tenant permission system.
+              (MASVS-AUTH \u2014 documented limitation, not a bug)
+            </td>
+          </tr>
+          <tr>
+            <td>Root/jailbreak &amp; tamper detection</td>
+            <td><span class="tag pii-med">Not yet</span></td>
+            <td>Not implemented in this pass.</td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>What's deliberately minimized</h2>
+      <ul>
+        <li>
+          <strong>Birth date:</strong> only <code>BirthYear</code> is collected
+          — no month or day. The app computes an approximate age from the year
+          alone.
+        </li>
+        <li>
+          <strong>No per-person tracking ID:</strong> people are identified by
+          their family's <code>FamilyId</code> + name, not a separate ID
+          stitched to one individual.
+        </li>
+        <li>
+          <strong>No consent/visibility flags today:</strong> everything in the
+          CSV is visible to every logged-in member of that community. Don't put
+          a field in the CSV unless the whole community may see it.
+        </li>
+      </ul>
+
+      <h2>Fields to think twice about</h2>
+      <div class="excel excel-scroll">
+        <table>
+          <tr class="headers">
+            <th>Field</th>
+            <th>Why it's sensitive</th>
+            <th>Guidance</th>
+          </tr>
+          <tr>
+            <td>ContactNumber1/2, WhatsApp, EMail</td>
+            <td>
+              Direct contact PII; enables real-world contact or impersonation if
+              leaked.
+            </td>
+            <td>
+              Core to the app's purpose (call/WhatsApp/mail actions, login) —
+              keep, but don't distribute the CSV file itself outside trusted
+              admins.
+            </td>
+          </tr>
+          <tr>
+            <td>AddressLine1-3, Pincode</td>
+            <td>Precise home location.</td>
+            <td>
+              Kept by this community's choice. If not needed, use only
+              Area/City/State instead.
+            </td>
+          </tr>
+          <tr>
+            <td>LinkedIn, Facebook, Twitter</td>
+            <td>Public profiles, but still directly linkable identity.</td>
+            <td>
+              Optional — only include what the person has already made public.
+            </td>
+          </tr>
+          <tr>
+            <td>Mosal, NativeVillage, Kuldevi</td>
+            <td>Lineage/caste-adjacent, culturally significant information.</td>
+            <td>
+              Only include with the family's explicit understanding of why it's
+              collected and who can see it.
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <h2>Handling the CSV file itself</h2>
+      <ul>
+        <li>
+          Treat the CSV/Google Sheet as sensitive — restrict edit/view access to
+          trusted admins, same as you would a phone/address book.
+        </li>
+        <li>
+          The Google Sheet builder's Drive file inherits your Drive's sharing
+          settings — check it isn't shared more broadly than intended.
+        </li>
+        <li>
+          Clearing data in-app (Import ▸ "Clear imported data") removes
+          everything from that device; it doesn't affect other admins' copies of
+          the source CSV/Sheet.
+        </li>
+      </ul>
+
+      <div class="callout warn">
+        This is guidance, not a compliance certification. If your community is
+        subject to specific data-protection law, get that reviewed independently
+        before importing sensitive fields.
+      </div>
+
+      <h2>FAQ</h2>
+
+      <h3>
+        Can two communities use the same app install without seeing each other's
+        data?
+      </h3>
+      <p>
+        Yes. Each import is scoped to its own <code>CommunityCode</code>;
+        contacts from one community never appear mixed with another's, and
+        importing one doesn't touch the other's storage.
+      </p>
+
+      <h3>
+        What happens if I accidentally reuse another community's CommunityCode?
+      </h3>
+      <p>
+        The app locks a display name the first time it sees a new
+        <code>CommunityCode</code>. Any later import that would replace an
+        existing community/region's data shows a confirmation dialog with that
+        locked name and the exact row counts before anything is overwritten —
+        nothing happens silently, and a wrong locked name is your cue that the
+        code has already been used by someone else.
+      </p>
+
+      <h3>How do family members request an update to their details?</h3>
+      <p>
+        Each person's profile shows their family's <code>FamilyId</code>
+        ("quote this + your name to request an update"). They pass that to the
+        admin (WhatsApp, a form, however your community communicates); the admin
+        finds that row in the master Sheet/CSV by
+        <code>FamilyId</code> + name, edits it, and re-imports. There's no
+        in-app self-service editing — this app has no backend to write to.
+      </p>
+
+      <h3>How does an admin re-import to fix/update existing data?</h3>
+      <p>
+        Edit the same Sheet/CSV and export again with the identical
+        <code>CommunityCode</code> (and <code>RegionCode</code>, if used). That
+        exact combination is what the app matches on to treat it as an upgrade,
+        not a new community.
+      </p>
+
+      <h3>
+        My community has thousands of members across several states — one CSV?
+      </h3>
+      <p>
+        Split by <code>RegionCode</code> instead: one file per district/state,
+        all sharing the same <code>CommunityCode</code>. Each region can be
+        prepared and re-imported independently without waiting on, or
+        overwriting, the others. See
+        <a href="prepare-csv.html">Prepare your CSV</a>.
+      </p>
+
+      <h3>Do family numbers need to be unique across the whole community?</h3>
+      <p>
+        Only within their own <code>CommunityCode</code> +
+        <code>RegionCode</code>. Each region's admin can number their own
+        families independently — no cross-region coordination needed.
+      </p>
+
+      <h3>Where is the data actually stored?</h3>
+      <p>
+        On the device, in local app storage. There is no server and no cloud
+        sync built into the app itself — only what you import via CSV.
+      </p>
+    </main>
+
+    <footer class="site">
+      Kutumb Connect is a volunteer, offline-first community directory app. This
+      guide covers CSV preparation and import behavior only.
+      <div class="by">A <a href="../index.html">Setunex</a> product</div>
+    </footer>
+  </body>
+</html>
