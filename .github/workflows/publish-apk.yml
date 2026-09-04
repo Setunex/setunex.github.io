@@ -1,0 +1,115 @@
+name: Publish APK to setunex.github.io
+
+# Reusable workflow: source repos call this after building a signed APK to
+# publish it at downloads/<app-slug>-latest.apk on this site. The token is
+# minted at runtime from the "Setunex APK Publisher" GitHub App, whose only
+# permission is Contents:R/W on Setunex/setunex.github.io.
+
+on:
+  workflow_call:
+    inputs:
+      app-slug:
+        description: 'File slug used for downloads/<slug>-latest.apk and .json (e.g. adhyayan, contacts)'
+        required: true
+        type: string
+      version:
+        description: 'Human-readable version string written into the metadata JSON'
+        required: true
+        type: string
+      apk-artifact:
+        description: 'Name of the actions/upload-artifact bundle from the caller job that contains the signed .apk'
+        required: true
+        type: string
+      retain-versioned:
+        description: 'Number of <slug>-<version>.apk files to keep alongside <slug>-latest.apk. 0 = only latest.'
+        required: false
+        type: number
+        default: 2
+    secrets:
+      app-id:
+        required: true
+      app-key:
+        required: true
+
+permissions: {}
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint short-lived site-write token
+        id: site_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.app-id }}
+          private-key: ${{ secrets.app-key }}
+          owner: Setunex
+          repositories: setunex.github.io
+
+      - name: Download APK artifact from caller run
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.apk-artifact }}
+          path: apk
+
+      - name: Commit APK + metadata to setunex.github.io
+        env:
+          GH_TOKEN: ${{ steps.site_token.outputs.token }}
+          APP_SLUG: ${{ inputs.app-slug }}
+          VERSION: ${{ inputs.version }}
+          RETAIN_VERSIONED: ${{ inputs.retain-versioned }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          APK_FILE=$(find apk -type f -name '*.apk' | head -n1)
+          if [ -z "$APK_FILE" ]; then
+            echo "No .apk found in artifact '${{ inputs.apk-artifact }}'." >&2
+            exit 1
+          fi
+
+          git config --global user.email "actions@github.com"
+          git config --global user.name  "Setunex APK Publisher"
+
+          git clone --depth=1 \
+            "https://x-access-token:${GH_TOKEN}@github.com/Setunex/setunex.github.io.git" site
+
+          mkdir -p site/downloads
+          cp "$APK_FILE" "site/downloads/${APP_SLUG}-latest.apk"
+          # Also keep a version-named copy so previous builds can be linked to; the
+          # prune step below caps how many of these we retain.
+          cp "$APK_FILE" "site/downloads/${APP_SLUG}-${VERSION}.apk"
+
+          # sort -V puts oldest version first, newest last. We drop the leading
+          # (COUNT - RETAIN_VERSIONED) entries so only the newest N survive.
+          mapfile -t VERSIONED < <(find "site/downloads" -maxdepth 1 -type f \
+            -name "${APP_SLUG}-*.apk" ! -name "${APP_SLUG}-latest.apk" \
+            -printf '%f\n' | sort -V)
+          COUNT=${#VERSIONED[@]}
+          if [ "$COUNT" -gt "$RETAIN_VERSIONED" ]; then
+            TO_DELETE=$((COUNT - RETAIN_VERSIONED))
+            for ((i=0; i<TO_DELETE; i++)); do
+              rm -f "site/downloads/${VERSIONED[$i]}"
+            done
+          fi
+
+          SIZE=$(stat -c%s "site/downloads/${APP_SLUG}-latest.apk")
+          PUBLISHED_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          cat > "site/downloads/${APP_SLUG}-latest.json" <<EOF
+          {
+            "version": "${VERSION}",
+            "published_at": "${PUBLISHED_AT}",
+            "size": ${SIZE},
+            "sha": "${SOURCE_SHA}"
+          }
+          EOF
+
+          cd site
+          # -A picks up both the new APK/JSON and any pruned versioned files.
+          git add -A downloads/
+          if git diff --cached --quiet; then
+            echo "No APK change; nothing to publish."
+            exit 0
+          fi
+          git commit -m "${APP_SLUG}: publish ${VERSION}"
+          git push

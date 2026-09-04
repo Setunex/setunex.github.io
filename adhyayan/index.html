@@ -41,9 +41,7 @@
 
 			<h2 id="download">Download</h2>
 			<div class="callout" id="download-info">
-				<p>Fetching the latest release…</p>
-				<a class="cta" href="https://github.com/Setunex/Adhyayan/releases/latest" target="_blank" rel="noopener">⭳ Latest release</a>
-				<!--<a class="cta outline" href="https://github.com/Setunex/Adhyayan/releases" target="_blank" rel="noopener">All releases</a>-->
+				<a class="cta" href="../downloads/adhyayan-latest.apk">⭳ Download APK</a>
 			</div>
 			<p class="muted-note">
 				The APK is a signed release build published from the project's GitHub Actions workflow. On first install Android may ask you to allow installs from your browser — the app itself contains no
@@ -100,11 +98,13 @@
 		<footer class="site">Setunex builds private, offline-first apps for communities. No servers, no accounts, no tracking.</footer>
 
 		<script>
-			// Populate the Download card from the latest GitHub release. Repo owner
-			// is the only thing that needs to change if the release pipeline moves —
-			// the APK filename now embeds the version so we match by extension.
+			// APK is committed to this repo by the private source repo's CI at a
+			// fixed path; the direct link above always works. This script only
+			// enriches the callout with version/date/size when the sibling
+			// metadata JSON is present.
 			(function () {
-				var REPO = 'Setunex/Adhyayan';
+				var APK_URL = '../downloads/adhyayan-latest.apk';
+				var META_URL = '../downloads/adhyayan-latest.json';
 				var el = document.getElementById('download-info');
 				if (!el) return;
 
@@ -120,45 +120,21 @@
 					});
 				}
 
-				function fallback() {
-					el.innerHTML =
-						'<p>Latest signed release is published on GitHub.</p>' +
-						'<a class="cta" href="https://github.com/' +
-						REPO +
-						'/releases/latest" target="_blank" rel="noopener">⭳ Latest release</a> ' +
-						'<a class="cta outline" href="https://github.com/' +
-						REPO +
-						'/releases" target="_blank" rel="noopener">All releases</a>';
-				}
-
-				fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
-					headers: { Accept: 'application/vnd.github+json' }
-				})
+				fetch(META_URL, { cache: 'no-cache' })
 					.then(function (r) {
 						if (!r.ok) throw new Error('HTTP ' + r.status);
 						return r.json();
 					})
-					.then(function (release) {
-						var assets = release.assets || [];
-						var apk = null;
-						for (var i = 0; i < assets.length; i++) {
-							if (/\.apk$/i.test(assets[i].name)) {
-								apk = assets[i];
-								break;
-							}
-						}
-						if (!apk && assets.length) apk = assets[0];
-
-						var url = apk ? apk.browser_download_url : 'https://github.com/' + REPO + '/releases/latest';
-						var sizeMb = apk ? Math.round((apk.size / (1024 * 1024)) * 10) / 10 + ' MB' : '';
-						var date = release.published_at
-							? new Date(release.published_at).toLocaleDateString(undefined, {
+					.then(function (meta) {
+						var version = meta.version || 'Latest';
+						var sizeMb = meta.size ? Math.round((meta.size / (1024 * 1024)) * 10) / 10 + ' MB' : '';
+						var date = meta.published_at
+							? new Date(meta.published_at).toLocaleDateString(undefined, {
 									year: 'numeric',
 									month: 'short',
 									day: 'numeric'
 								})
 							: '';
-						var version = release.name || release.tag_name || 'Latest';
 
 						el.innerHTML =
 							'<div class="download-meta">' +
@@ -168,13 +144,12 @@
 							(date || sizeMb ? ' <span>' + escapeHtml(date) + (date && sizeMb ? ' · ' : '') + escapeHtml(sizeMb) + '</span>' : '') +
 							'</div>' +
 							'<a class="cta" href="' +
-							escapeHtml(url) +
-							'">⭳ Download APK</a> ' +
-							'<a class="cta outline" href="https://github.com/' +
-							REPO +
-							'/releases" target="_blank" rel="noopener">All releases</a>';
+							escapeHtml(APK_URL) +
+							'">⭳ Download APK</a>';
 					})
-					.catch(fallback);
+					.catch(function () {
+						/* leave the plain download button in place */
+					});
 			})();
 		</script>
 	</body>
