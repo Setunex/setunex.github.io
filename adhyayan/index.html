@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Adhyayan — Setunex</title>
+		<meta name="description" content="Adhyayan is a private, offline-first learning companion for Sanskrit stotras. Content and progress stay on your device — no accounts, no servers." />
+		<link rel="stylesheet" href="../assets/style.css" />
+	</head>
+	<body>
+		<div class="umbrella">
+			<div class="bar">
+				<a class="org" href="../index.html">◇ Setunex</a>
+				<span class="crumb">Adhyayan</span>
+			</div>
+		</div>
+		<header class="site">
+			<div class="bar">
+				<a class="brand" href="index.html">Adhyayan</a>
+				<nav>
+					<a href="index.html" class="active">Home</a>
+					<a href="#download">Download</a>
+					<a href="#features">Features</a>
+				</nav>
+			</div>
+		</header>
+
+		<main class="hero-main">
+			<div class="org-hero">
+				<div class="eyebrow">Private by design</div>
+				<h1>Adhyayan</h1>
+				<p class="tagline">
+					अध्ययन
+					<span class="en">Study — at your own pace, on your own device</span>
+				</p>
+				<p class="lede">
+					A learning companion for Sanskrit stotras. Read a stotra as a continuous recitation or study it verse-by-verse with notes, search across scripts using plain English typing, and adjust font
+					size or meaning visibility on the fly. Everything runs on your phone — no accounts, no servers, no tracking.
+				</p>
+			</div>
+
+			<h2 id="download">Download</h2>
+			<div class="callout" id="download-info">
+				<p>Fetching the latest release…</p>
+				<a class="cta" href="https://github.com/Setunex/Adhyayan/releases/latest" target="_blank" rel="noopener">⭳ Latest release</a>
+				<!--<a class="cta outline" href="https://github.com/Setunex/Adhyayan/releases" target="_blank" rel="noopener">All releases</a>-->
+			</div>
+			<p class="muted-note">
+				The APK is a signed release build published from the project's GitHub Actions workflow. On first install Android may ask you to allow installs from your browser — the app itself contains no
+				ads, trackers, or network calls beyond fetching optional content.
+			</p>
+
+			<h2 id="features">What's inside</h2>
+			<div class="features">
+				<div class="feature">
+					<span class="emoji">📖</span>
+					<h4>Two readers, one text</h4>
+					<p>
+						Read a stotra as a continuous list for recitation, or switch to a paginated study view — one verse per page, with adjacent notes grouped so an eight-verse ashtakam paginates as eight
+						pages.
+					</p>
+				</div>
+				<div class="feature">
+					<span class="emoji">🔤</span>
+					<h4>Romanized search</h4>
+					<p>
+						Search runs on a diacritic-folded romanized form, so
+						<em>bhavani</em> matches <em>Bhavānī</em>. Every listing has a romanized English title, so you can find a stotra without knowing Devanagari.
+					</p>
+				</div>
+				<div class="feature">
+					<span class="emoji">🎚️</span>
+					<h4>Live reader controls</h4>
+					<p>A persistent inline toolbar on both readers steps font size and toggles meaning on or off. Changes apply instantly across every page — Settings just holds the defaults.</p>
+				</div>
+				<div class="feature">
+					<span class="emoji">✈️</span>
+					<h4>Offline first</h4>
+					<p>Content is bundled with the app and rendered from local JSON. The network is optional — the reader keeps working with the phone in airplane mode.</p>
+				</div>
+				<div class="feature">
+					<span class="emoji">🔒</span>
+					<h4>Nothing to breach</h4>
+					<p>No accounts, no login, no analytics. There is no server holding your progress — each install is a self-contained copy on your device.</p>
+				</div>
+				<div class="feature">
+					<span class="emoji">🧩</span>
+					<h4>Editable source of truth</h4>
+					<p>Runtime content is generated from romanized SLP1 source files, so each stotra has a single canonical form that scripts and future transliterations can be regenerated from.</p>
+				</div>
+			</div>
+
+			<h2 id="tech">Built with</h2>
+			<p>
+				Ionic React + Capacitor, TypeScript, Vite, and Redux for state. The Android app is packaged from the web build via Capacitor and signed in GitHub Actions before publishing to the release page
+				above.
+			</p>
+		</main>
+
+		<footer class="site">Setunex builds private, offline-first apps for communities. No servers, no accounts, no tracking.</footer>
+
+		<script>
+			// Populate the Download card from the latest GitHub release. Repo owner
+			// is the only thing that needs to change if the release pipeline moves —
+			// the APK filename now embeds the version so we match by extension.
+			(function () {
+				var REPO = 'Setunex/Adhyayan';
+				var el = document.getElementById('download-info');
+				if (!el) return;
+
+				function escapeHtml(s) {
+					return String(s).replace(/[&<>"']/g, function (c) {
+						return {
+							'&': '&amp;',
+							'<': '&lt;',
+							'>': '&gt;',
+							'"': '&quot;',
+							"'": '&#39;'
+						}[c];
+					});
+				}
+
+				function fallback() {
+					el.innerHTML =
+						'<p>Latest signed release is published on GitHub.</p>' +
+						'<a class="cta" href="https://github.com/' +
+						REPO +
+						'/releases/latest" target="_blank" rel="noopener">⭳ Latest release</a> ' +
+						'<a class="cta outline" href="https://github.com/' +
+						REPO +
+						'/releases" target="_blank" rel="noopener">All releases</a>';
+				}
+
+				fetch('https://api.github.com/repos/' + REPO + '/releases/latest', {
+					headers: { Accept: 'application/vnd.github+json' }
+				})
+					.then(function (r) {
+						if (!r.ok) throw new Error('HTTP ' + r.status);
+						return r.json();
+					})
+					.then(function (release) {
+						var assets = release.assets || [];
+						var apk = null;
+						for (var i = 0; i < assets.length; i++) {
+							if (/\.apk$/i.test(assets[i].name)) {
+								apk = assets[i];
+								break;
+							}
+						}
+						if (!apk && assets.length) apk = assets[0];
+
+						var url = apk ? apk.browser_download_url : 'https://github.com/' + REPO + '/releases/latest';
+						var sizeMb = apk ? Math.round((apk.size / (1024 * 1024)) * 10) / 10 + ' MB' : '';
+						var date = release.published_at
+							? new Date(release.published_at).toLocaleDateString(undefined, {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								})
+							: '';
+						var version = release.name || release.tag_name || 'Latest';
+
+						el.innerHTML =
+							'<div class="download-meta">' +
+							'<strong>' +
+							escapeHtml(version) +
+							'</strong>' +
+							(date || sizeMb ? ' <span>' + escapeHtml(date) + (date && sizeMb ? ' · ' : '') + escapeHtml(sizeMb) + '</span>' : '') +
+							'</div>' +
+							'<a class="cta" href="' +
+							escapeHtml(url) +
+							'">⭳ Download APK</a> ' +
+							'<a class="cta outline" href="https://github.com/' +
+							REPO +
+							'/releases" target="_blank" rel="noopener">All releases</a>';
+					})
+					.catch(fallback);
+			})();
+		</script>
+	</body>
+</html>
