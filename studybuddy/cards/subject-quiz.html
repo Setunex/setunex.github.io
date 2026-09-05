@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Learning Quiz | Bright Steps</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--ink: #26334d;
+				--teal: #167d7f;
+				--leaf: #328b63;
+				--coral: #de6256;
+				--sun: #f5bd36;
+				--paper: #fffdf7;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				min-height: 100vh;
+				color: var(--ink);
+				font-family: 'Nunito', sans-serif;
+				background: #edf8f3;
+				background-image: radial-gradient(circle at 10% 12%, #ffe49a 0 5%, transparent 5.2%), radial-gradient(circle at 91% 82%, #b8e5df 0 9%, transparent 9.2%);
+			}
+			.app {
+				width: min(100% - 28px, 680px);
+				margin: 0 auto;
+				padding: 20px 0 44px;
+			}
+			.topbar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 22px;
+			}
+			.home {
+				color: var(--teal);
+				font-weight: 800;
+				text-decoration: none;
+			}
+			.grade {
+				padding: 6px 10px;
+				border-radius: 7px;
+				color: #72540b;
+				background: #fff2c9;
+				font-size: 0.78rem;
+				font-weight: 800;
+			}
+			header {
+				text-align: center;
+				margin-bottom: 18px;
+			}
+			h1,
+			h2,
+			button {
+				font-family: 'Baloo 2', cursive;
+				letter-spacing: 0;
+			}
+			h1 {
+				margin: 0;
+				font-size: clamp(2rem, 8vw, 2.65rem);
+				line-height: 1;
+			}
+			header p {
+				margin: 7px 0 0;
+				color: #60768a;
+				font-weight: 700;
+			}
+			.levels {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 7px;
+				margin-bottom: 18px;
+			}
+			.level {
+				padding: 9px 6px;
+				border: 2px solid #d7e5df;
+				border-radius: 8px;
+				color: #526a7a;
+				background: #fffdf7;
+				cursor: pointer;
+				font-weight: 700;
+			}
+			.level.active {
+				border-color: var(--teal);
+				color: #fff;
+				background: var(--teal);
+			}
+			.progress-label {
+				display: flex;
+				justify-content: space-between;
+				margin: 0 0 6px;
+				color: #60768a;
+				font-size: 0.84rem;
+				font-weight: 800;
+			}
+			.card {
+				margin-top: 14px;
+				padding: 26px 22px 22px;
+				border: 2px solid #dce9e2;
+				border-radius: 8px;
+				background: var(--paper);
+				box-shadow: 0 7px 0 #cfe0d8;
+			}
+			.badge {
+				display: inline-block;
+				padding: 6px 11px;
+				border-radius: 7px;
+				color: #0e6062;
+				background: #d9f1ed;
+				font-size: 0.78rem;
+				font-weight: 800;
+			}
+			.question {
+				margin: 15px 0 21px;
+				font-family: 'Baloo 2', cursive;
+				font-size: clamp(1.3rem, 5vw, 1.7rem);
+				line-height: 1.35;
+			}
+			.choices {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 12px;
+			}
+			.choice {
+				min-height: 76px;
+				padding: 8px;
+				border: 2px solid #dfe8e4;
+				border-radius: 8px;
+				color: var(--ink);
+				background: #fff;
+				cursor: pointer;
+				font-size: 1.15rem;
+				font-weight: 700;
+			}
+			.choice:hover {
+				border-color: var(--teal);
+				transform: translateY(-2px);
+			}
+			.choice:disabled {
+				cursor: default;
+			}
+			.choice.correct {
+				color: #185e43;
+				background: #e4f7ec;
+				border-color: var(--leaf);
+			}
+			.choice.wrong {
+				color: #953f39;
+				background: #ffedeb;
+				border-color: var(--coral);
+			}
+			.feedback {
+				display: none;
+				margin-top: 17px;
+				padding: 13px 14px;
+				border-radius: 7px;
+				font-weight: 800;
+				line-height: 1.4;
+			}
+			.feedback.show {
+				display: block;
+			}
+			.feedback.good {
+				color: #185e43;
+				background: #e4f7ec;
+			}
+			.feedback.bad {
+				color: #82463b;
+				background: #fff0de;
+			}
+			.next {
+				display: none;
+				width: 100%;
+				margin-top: 16px;
+				padding: 13px;
+				border: 0;
+				border-radius: 8px;
+				color: #fff;
+				background: var(--teal);
+				cursor: pointer;
+				font-size: 1.1rem;
+				font-weight: 700;
+			}
+			.next.show {
+				display: block;
+			}
+			@media (max-width: 390px) {
+				.card {
+					padding: 22px 16px 17px;
+				}
+				.choices {
+					gap: 9px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="app">
+			<div class="topbar"><a class="home" href="index.html">&larr; Home</a><span class="grade">Grade 2 Path</span></div>
+			<header>
+				<h1 id="title">Maths Adventure</h1>
+				<p id="subtitle">Build number confidence one question at a time.</p>
+			</header>
+			<div class="levels" aria-label="Choose quiz difficulty">
+				<button class="level active" type="button" data-level="basic">Basic</button><button class="level" type="button" data-level="medium">Medium</button
+				><button class="level" type="button" data-level="challenge">Challenge</button>
+			</div>
+			<div class="progress-label"><span id="count">Question 1</span><span id="score">Score: 0</span></div>
+			<section class="card">
+				<span class="badge" id="badge">Basic practice</span>
+				<div class="question" id="question"></div>
+				<div class="choices" id="choices"></div>
+				<div class="feedback" id="feedback" aria-live="polite"></div>
+				<button class="next" id="next" type="button">Next question &rarr;</button>
+			</section>
+		</main>
+		<script>
+			const subject = new URLSearchParams(location.search).get('subject') || 'maths';
+			let level = 'basic';
+			let current = 0;
+			let score = 0;
+			let activeQuestion;
+			const elements = {
+				title: document.getElementById('title'),
+				subtitle: document.getElementById('subtitle'),
+				count: document.getElementById('count'),
+				score: document.getElementById('score'),
+				badge: document.getElementById('badge'),
+				question: document.getElementById('question'),
+				choices: document.getElementById('choices'),
+				feedback: document.getElementById('feedback'),
+				next: document.getElementById('next')
+			};
+
+			function randomInt(minimum, maximum) {
+				return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum;
+			}
+			function randomItem(items) {
+				return items[randomInt(0, items.length - 1)];
+			}
+			function shuffle(items) {
+				for (let index = items.length - 1; index > 0; index -= 1) {
+					const randomIndex = randomInt(0, index);
+					[items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+				}
+				return items;
+			}
+			function numberOptions(answer) {
+				const options = new Set([answer]);
+				while (options.size < 4) options.add(Math.max(0, answer + randomInt(-8, 8)));
+				return shuffle([...options].map(String));
+			}
+			function mathsQuestion() {
+				if (level === 'basic') {
+					const first = randomInt(1, 10);
+					const second = randomInt(1, 10);
+					const addition = Math.random() < 0.6;
+					const answer = addition ? first + second : Math.max(first, second) - Math.min(first, second);
+					const text = addition ? `What is ${first} + ${second}?` : `What is ${Math.max(first, second)} - ${Math.min(first, second)}?`;
+					return { answer: String(answer), options: numberOptions(answer), text, clue: `The correct answer is ${answer}.` };
+				}
+				if (level === 'medium') {
+					if (Math.random() < 0.5) {
+						const start = randomInt(10, 65);
+						const step = randomInt(2, 10);
+						const answer = start + step * 3;
+						return {
+							answer: String(answer),
+							options: numberOptions(answer),
+							text: `What number comes next?<br><br>${start}, ${start + step}, ${start + step * 2}, __`,
+							clue: `The pattern adds ${step} each time. The correct answer is ${answer}.`
+						};
+					}
+					const number = randomInt(20, 99);
+					const tens = Math.floor(number / 10);
+					return {
+						answer: String(tens),
+						options: numberOptions(tens),
+						text: `How many tens are in ${number}?`,
+						clue: `The correct answer is ${tens}. ${number} has ${tens} tens and ${number % 10} ones.`
+					};
+				}
+				const first = randomInt(18, 50);
+				const second = randomInt(8, 25);
+				const addition = Math.random() < 0.5;
+				const answer = addition ? first + second : first - second;
+				const action = addition ? `has ${first} stickers and gets ${second} more` : `has ${first} stickers and gives ${second} away`;
+				return {
+					answer: String(answer),
+					options: numberOptions(answer),
+					text: `Mia ${action}. How many stickers does Mia have now?`,
+					clue: `The correct answer is ${answer}. ${addition ? `${first} + ${second}` : `${first} - ${second}`} = ${answer}.`
+				};
+			}
+
+			const scienceFacts = [
+				{
+					text: 'Which is a living thing?',
+					answer: 'Butterfly',
+					options: ['Butterfly', 'Rock', 'Pencil', 'Spoon'],
+					clue: 'The correct answer is Butterfly. A butterfly is living because it grows and needs food.'
+				},
+				{ text: 'Which body part helps you hear?', answer: 'Ears', options: ['Ears', 'Eyes', 'Hands', 'Feet'], clue: 'The correct answer is Ears. We use our ears to hear sounds.' },
+				{
+					text: 'Which part of a plant takes in water from the soil?',
+					answer: 'Roots',
+					options: ['Roots', 'Flowers', 'Leaves', 'Fruit'],
+					clue: 'The correct answer is Roots. Roots take in water from the soil.'
+				},
+				{ text: 'Which animal lives in water?', answer: 'Fish', options: ['Fish', 'Camel', 'Tiger', 'Rabbit'], clue: 'The correct answer is Fish. Fish live in water and use gills to breathe.' },
+				{
+					text: 'Which object is attracted to a magnet?',
+					answer: 'Iron nail',
+					options: ['Iron nail', 'Wooden stick', 'Plastic cup', 'Paper bag'],
+					clue: 'The correct answer is Iron nail. Magnets attract iron objects.'
+				},
+				{ text: 'Which is a source of light?', answer: 'Sun', options: ['Sun', 'Moon', 'Mirror', 'Book'], clue: 'The correct answer is Sun. The Sun gives us light and heat.' }
+			];
+			const scienceApplications = [
+				{
+					text: 'Riya keeps a plant in a dark cupboard. What will help it grow better?',
+					answer: 'Put it in sunlight',
+					options: ['Put it in sunlight', 'Give it a toy', 'Cover the leaves', 'Keep it dry'],
+					clue: 'The correct answer is Put it in sunlight. Plants need sunlight to make their food.'
+				},
+				{
+					text: 'Which material is best for a raincoat?',
+					answer: 'Waterproof plastic',
+					options: ['Waterproof plastic', 'Tissue paper', 'Cotton wool', 'Cardboard'],
+					clue: 'The correct answer is Waterproof plastic. A raincoat must keep water out.'
+				},
+				{
+					text: 'A child is crossing a road. Which sense helps them listen for traffic?',
+					answer: 'Hearing',
+					options: ['Hearing', 'Taste', 'Smell', 'Touch'],
+					clue: 'The correct answer is Hearing. Ears help us hear traffic sounds.'
+				},
+				{
+					text: 'Which animal is best suited to a hot desert?',
+					answer: 'Camel',
+					options: ['Camel', 'Penguin', 'Polar bear', 'Seal'],
+					clue: 'The correct answer is Camel. Camels are adapted to live in hot, dry deserts.'
+				}
+			];
+			function scienceQuestion() {
+				if (level === 'basic') return randomItem(scienceFacts);
+				if (level === 'medium') return randomItem([...scienceFacts, ...scienceApplications]);
+				return randomItem(scienceApplications);
+			}
+
+			const reasoningOddOnes = [
+				{
+					text: 'Which one does not belong?',
+					answer: 'Chair',
+					options: ['Cat', 'Dog', 'Chair', 'Rabbit'],
+					clue: 'The correct answer is Chair. Cat, dog, and rabbit are animals; a chair is furniture.'
+				},
+				{
+					text: 'Which one does not belong?',
+					answer: 'Carrot',
+					options: ['Carrot', 'Rose', 'Lily', 'Tulip'],
+					clue: 'The correct answer is Carrot. Rose, lily, and tulip are flowers; carrot is a vegetable.'
+				},
+				{
+					text: 'Which one does not belong?',
+					answer: 'Pencil',
+					options: ['Pencil', 'Monday', 'Tuesday', 'Wednesday'],
+					clue: 'The correct answer is Pencil. Monday, Tuesday, and Wednesday are days of the week.'
+				}
+			];
+			function reasoningQuestion() {
+				if (level === 'basic') {
+					const start = randomInt(1, 30);
+					const step = randomInt(2, 5);
+					const answer = start + step * 3;
+					return {
+						answer: String(answer),
+						options: numberOptions(answer),
+						text: `What comes next?<br><br>${start}, ${start + step}, ${start + step * 2}, __`,
+						clue: `The pattern adds ${step} each time. The correct answer is ${answer}.`
+					};
+				}
+				if (level === 'medium') return randomItem(reasoningOddOnes);
+				const puzzles = [
+					{
+						text: 'Ava is taller than Ben. Ben is taller than Cara. Who is the shortest?',
+						answer: 'Cara',
+						options: ['Ava', 'Ben', 'Cara', 'They are equal'],
+						clue: 'The correct answer is Cara. Ava is taller than Ben, and Ben is taller than Cara.'
+					},
+					{
+						text: 'Today is Tuesday. What day will it be two days later?',
+						answer: 'Thursday',
+						options: ['Wednesday', 'Thursday', 'Friday', 'Sunday'],
+						clue: 'The correct answer is Thursday. Wednesday is one day later and Thursday is two days later.'
+					},
+					{
+						text: 'A bag has 3 red balls and 2 blue balls. Without looking, which colour is more likely to be picked?',
+						answer: 'Red',
+						options: ['Red', 'Blue', 'Both equally likely', 'No colour'],
+						clue: 'The correct answer is Red. There are more red balls than blue balls in the bag.'
+					}
+				];
+				return randomItem(puzzles);
+			}
+
+			const subjects = {
+				maths: { title: 'Maths Adventure', subtitle: 'Build number confidence one question at a time.', create: mathsQuestion },
+				science: { title: 'Science Explorer', subtitle: 'Discover living things, plants, materials, and your body.', create: scienceQuestion },
+				reasoning: { title: 'Reasoning Lab', subtitle: 'Spot patterns, solve puzzles, and think logically.', create: reasoningQuestion }
+			};
+			const activeSubject = subjects[subject] ? subject : 'maths';
+			elements.title.textContent = subjects[activeSubject].title;
+			elements.subtitle.textContent = subjects[activeSubject].subtitle;
+			document.title = `${subjects[activeSubject].title} | Bright Steps`;
+
+			function createQuestion() {
+				return subjects[activeSubject].create();
+			}
+			function renderQuestion() {
+				activeQuestion = createQuestion();
+				elements.count.textContent = `Question ${current + 1}`;
+				elements.score.textContent = `Score: ${score}`;
+				elements.badge.textContent = `${level[0].toUpperCase()}${level.slice(1)} practice`;
+				elements.question.innerHTML = activeQuestion.text;
+				elements.choices.innerHTML = '';
+				activeQuestion.options.forEach(option => {
+					const button = document.createElement('button');
+					button.className = 'choice';
+					button.type = 'button';
+					button.textContent = option;
+					button.addEventListener('click', () => answer(option, button));
+					elements.choices.appendChild(button);
+				});
+				elements.feedback.className = 'feedback';
+				elements.next.className = 'next';
+			}
+			function answer(selected, button) {
+				const correct = selected === activeQuestion.answer;
+				elements.choices.querySelectorAll('button').forEach(choice => {
+					choice.disabled = true;
+					if (choice.textContent === activeQuestion.answer) choice.classList.add('correct');
+				});
+				if (correct) score += 1;
+				else button.classList.add('wrong');
+				elements.score.textContent = `Score: ${score}`;
+				elements.feedback.textContent = `${correct ? 'Correct!' : 'Not quite.'} ${activeQuestion.clue}`;
+				elements.feedback.className = `feedback show ${correct ? 'good' : 'bad'}`;
+				elements.next.className = 'next show';
+			}
+			elements.next.addEventListener('click', () => {
+				current += 1;
+				renderQuestion();
+			});
+			document.querySelectorAll('.level').forEach(button =>
+				button.addEventListener('click', () => {
+					level = button.dataset.level;
+					current = 0;
+					score = 0;
+					document.querySelectorAll('.level').forEach(control => control.classList.toggle('active', control === button));
+					renderQuestion();
+				})
+			);
+			renderQuestion();
+		</script>
+	</body>
+</html>

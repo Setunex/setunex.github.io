@@ -1,0 +1,2990 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>ABC Adventure — Fullscreen Flashcards</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--ink: #3a3355;
+				--paper: #fffdf8;
+			}
+			* {
+				box-sizing: border-box;
+				-webkit-tap-highlight-color: transparent;
+			}
+			html,
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+			}
+			body {
+				font-family: 'Nunito', sans-serif;
+				background:
+					radial-gradient(circle at 12% 8%, #fff6cf 0%, transparent 40%), radial-gradient(circle at 90% 15%, #ffd8ec 0%, transparent 45%),
+					radial-gradient(circle at 20% 90%, #d3f3ff 0%, transparent 45%), linear-gradient(180deg, #eaf6ff 0%, #f4fbff 100%);
+				color: var(--ink);
+				min-height: 100%;
+				overflow-x: hidden;
+			}
+			#app {
+				max-width: 720px;
+				margin: 0 auto;
+				min-height: 100vh;
+				position: relative;
+				padding-bottom: 40px;
+			}
+			@media (min-width: 900px) {
+				#app {
+					max-width: 1080px;
+				}
+				.letter-grid {
+					grid-template-columns: repeat(8, 1fr) !important;
+				}
+				.category-grid {
+					grid-template-columns: repeat(4, 1fr) !important;
+				}
+				#catContent {
+					display: grid;
+					grid-template-columns: repeat(2, 1fr);
+					gap: 0 14px;
+				}
+				#catContent .empty-msg {
+					grid-column: 1/-1;
+				}
+				#content {
+					display: grid;
+					grid-template-columns: repeat(2, 1fr);
+					gap: 0 14px;
+				}
+				#content .empty-msg {
+					grid-column: 1/-1;
+				}
+			}
+			@media (min-width: 1300px) {
+				#app {
+					max-width: 1240px;
+				}
+				.letter-grid {
+					grid-template-columns: repeat(9, 1fr) !important;
+				}
+				#content {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
+
+			/* ---------- HOME ---------- */
+			#home-screen {
+				padding: 22px 16px 10px;
+			}
+			.hero {
+				text-align: center;
+				margin-bottom: 14px;
+			}
+			.hero h1 {
+				font-family: 'Baloo 2', cursive;
+				font-size: 2.3rem;
+				margin: 0;
+				color: #ff6b6b;
+				text-shadow:
+					3px 3px 0 #ffe08a,
+					-1px -1px 0 #fff;
+				letter-spacing: 1px;
+			}
+			.hero p {
+				margin: 6px 0 0;
+				font-weight: 800;
+				color: #6a5f9a;
+				font-size: 1.05rem;
+			}
+			.letter-grid {
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
+				gap: 14px;
+				padding: 10px 4px 20px;
+			}
+			@media (min-width: 480px) {
+				.letter-grid {
+					grid-template-columns: repeat(5, 1fr);
+				}
+			}
+
+			.letter-btn {
+				aspect-ratio: 1;
+				border: none;
+				border-radius: 46% 54% 53% 47%/45% 47% 53% 55%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.9rem;
+				color: #fff;
+				box-shadow:
+					0 6px 0 rgba(0, 0, 0, 0.13),
+					0 8px 14px rgba(0, 0, 0, 0.12);
+				cursor: pointer;
+				transform: rotate(var(--r, 0deg));
+				transition: transform 0.12s ease;
+				position: relative;
+			}
+			.letter-btn:active {
+				transform: rotate(var(--r, 0deg)) scale(0.9) translateY(4px);
+				box-shadow: 0 2px 0 rgba(0, 0, 0, 0.13);
+			}
+			.letter-btn .cnt {
+				position: absolute;
+				bottom: -6px;
+				right: -2px;
+				background: #fff;
+				color: var(--ink);
+				border-radius: 50%;
+				width: 20px;
+				height: 20px;
+				font-family: 'Nunito';
+				font-size: 0.62rem;
+				font-weight: 800;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+			}
+
+			.footnote {
+				text-align: center;
+				font-size: 0.85rem;
+				color: #8a80b8;
+				font-weight: 700;
+				padding: 6px 20px 0;
+			}
+
+			/* ---- tabs: by letter / by category ---- */
+			.tab-switch {
+				display: flex;
+				gap: 6px;
+				background: #fff;
+				border-radius: 20px;
+				padding: 6px;
+				box-shadow:
+					0 3px 0 rgba(0, 0, 0, 0.06),
+					0 4px 10px rgba(0, 0, 0, 0.06);
+				margin: 0 4px 18px;
+			}
+			.tab-btn {
+				flex: 1;
+				border: none;
+				background: transparent;
+				padding: 11px 8px;
+				border-radius: 15px;
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 0.95rem;
+				color: #9a90c2;
+				transition: all 0.15s;
+			}
+			.tab-btn.active {
+				background: linear-gradient(135deg, #ff8fb1, #ff6b6b);
+				color: #fff;
+				box-shadow: 0 3px 8px rgba(255, 107, 107, 0.35);
+			}
+
+			/* ---- category grid (home, by-category tab) ---- */
+			.category-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 14px;
+				padding: 2px 4px 20px;
+			}
+			.category-card {
+				background: var(--paper);
+				border: none;
+				border-radius: 24px;
+				padding: 20px 12px 16px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				box-shadow:
+					0 4px 0 rgba(0, 0, 0, 0.07),
+					0 6px 14px rgba(0, 0, 0, 0.08);
+				cursor: pointer;
+				transition: transform 0.1s ease;
+			}
+			.category-card:active {
+				transform: scale(0.95);
+			}
+			.category-card .cc-icon {
+				width: 54px;
+				height: 54px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.6rem;
+				background: var(--cat-color, #eee);
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+			}
+			.category-card .cc-label {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 0.95rem;
+				text-align: center;
+				color: var(--ink);
+			}
+			.category-card .cc-count {
+				font-size: 0.72rem;
+				font-weight: 800;
+				color: #9a90c2;
+			}
+
+			/* ---- category detail screen (list of words A-Z for one category) ---- */
+			.word-row {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				width: 100%;
+				background: var(--paper);
+				border: none;
+				border-radius: 20px;
+				padding: 12px 14px;
+				margin-bottom: 10px;
+				text-align: left;
+				cursor: pointer;
+				box-shadow:
+					0 3px 0 rgba(0, 0, 0, 0.06),
+					0 4px 10px rgba(0, 0, 0, 0.07);
+				transition: transform 0.1s ease;
+			}
+			.word-row:active {
+				transform: scale(0.97);
+			}
+			.word-row .wr-letter {
+				flex-shrink: 0;
+				width: 34px;
+				height: 34px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 0.95rem;
+				color: #fff;
+			}
+			.word-row .wr-emoji {
+				font-size: 1.7rem;
+				flex-shrink: 0;
+			}
+			.word-row .wr-word {
+				flex: 1;
+				font-weight: 800;
+				color: var(--ink);
+			}
+			.word-row .chev {
+				color: #c9c2e6;
+				font-size: 1.2rem;
+				flex-shrink: 0;
+			}
+
+			/* ---------- LETTER SCREEN ---------- */
+			#letter-screen {
+				display: none;
+			}
+			.topbar {
+				position: sticky;
+				top: 0;
+				z-index: 5;
+				padding: 16px 12px 20px;
+				border-radius: 0 0 28px 28px;
+				color: #fff;
+				box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+			}
+			.topbar-row {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+			.icon-btn {
+				background: rgba(255, 255, 255, 0.28);
+				border: none;
+				color: #fff;
+				font-size: 1.3rem;
+				width: 42px;
+				height: 42px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+			}
+			.icon-btn:active {
+				background: rgba(255, 255, 255, 0.5);
+			}
+			.big-letter-wrap {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 2px;
+			}
+			.big-letter {
+				font-family: 'Baloo 2', cursive;
+				font-size: 3.4rem;
+				font-weight: 800;
+				background: #fff;
+				color: var(--letter-color, #ff6b6b);
+				width: 92px;
+				height: 92px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+				cursor: pointer;
+			}
+			.big-letter:active {
+				transform: scale(0.94);
+			}
+			.letter-caption {
+				font-family: 'Nunito';
+				font-weight: 800;
+				font-size: 0.85rem;
+				opacity: 0.95;
+			}
+
+			.content {
+				padding: 16px 14px 30px;
+			}
+
+			/* ---- category tiles (fullscreen list, one tap = fullscreen flashcards) ---- */
+			.cat-tile {
+				display: flex;
+				align-items: center;
+				gap: 14px;
+				width: 100%;
+				background: var(--paper);
+				border: none;
+				border-radius: 24px;
+				padding: 16px 16px;
+				margin-bottom: 14px;
+				box-shadow:
+					0 4px 0 rgba(0, 0, 0, 0.07),
+					0 6px 14px rgba(0, 0, 0, 0.08);
+				cursor: pointer;
+				text-align: left;
+				transition: transform 0.1s ease;
+			}
+			.cat-tile:active {
+				transform: scale(0.97);
+			}
+			.cat-tile .pill {
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 56px;
+				height: 56px;
+				border-radius: 50%;
+				font-size: 1.7rem;
+				background: var(--cat-color, #eee);
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+			}
+			.cat-tile .info {
+				flex: 1;
+				min-width: 0;
+			}
+			.cat-tile .info .label {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1.15rem;
+				color: var(--ink);
+			}
+			.cat-tile .info .sub {
+				font-size: 0.82rem;
+				font-weight: 700;
+				color: #9a90c2;
+				margin-top: 2px;
+			}
+			.cat-tile .preview {
+				font-size: 2rem;
+				flex-shrink: 0;
+			}
+			.cat-tile .chev {
+				font-size: 1.3rem;
+				color: #c9c2e6;
+				flex-shrink: 0;
+			}
+
+			.empty-msg {
+				text-align: center;
+				color: #9a90c2;
+				font-weight: 700;
+				padding: 30px 20px;
+				font-size: 1rem;
+			}
+
+			img.twe {
+				height: 1em;
+				width: 1em;
+				vertical-align: -0.15em;
+				display: inline-block;
+			}
+
+			/* ---------- FULLSCREEN FLASHCARD VIEWER ---------- */
+			#viewer {
+				position: fixed;
+				inset: 0;
+				z-index: 50;
+				display: none;
+				flex-direction: column;
+				color: #fff;
+			}
+			#viewer.open {
+				display: flex;
+			}
+			.viewer-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 16px 14px;
+				flex-shrink: 0;
+			}
+			.viewer-header .vinfo {
+				flex: 1;
+				min-width: 0;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 8px;
+			}
+			.viewer-header .vlabel {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1.05rem;
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+			.viewer-header .vcount {
+				font-weight: 800;
+				font-size: 0.9rem;
+				background: rgba(255, 255, 255, 0.25);
+				padding: 4px 12px;
+				border-radius: 14px;
+			}
+			.viewer-close,
+			.viewer-hear {
+				background: rgba(255, 255, 255, 0.25);
+				border: none;
+				color: #fff;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				font-size: 1.3rem;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+			.viewer-close:active,
+			.viewer-hear:active {
+				background: rgba(255, 255, 255, 0.45);
+				transform: scale(0.92);
+			}
+
+			.viewer-stage {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				position: relative;
+				overflow: hidden;
+				touch-action: pan-y;
+			}
+			.flashcard {
+				position: absolute;
+				inset: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 14px 16px 84px;
+				opacity: 0;
+				transform: scale(0.9);
+				transition:
+					opacity 0.22s ease,
+					transform 0.22s ease;
+				pointer-events: none;
+			}
+			.flashcard.active {
+				opacity: 1;
+				transform: scale(1);
+				pointer-events: auto;
+			}
+			.flashcard .big-emoji {
+				font-size: min(66vw, 360px);
+				line-height: 1;
+				filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.18));
+			}
+			.flashcard .big-emoji img.twe {
+				width: min(66vw, 360px);
+				height: min(66vw, 360px);
+				display: block;
+			}
+			.flashcard .big-word {
+				position: absolute;
+				left: 50%;
+				bottom: 24px;
+				transform: translateX(-50%);
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.8rem;
+				background: rgba(255, 255, 255, 0.94);
+				color: var(--ink);
+				padding: 9px 26px;
+				border-radius: 30px;
+				box-shadow: 0 6px 0 rgba(0, 0, 0, 0.08);
+				white-space: nowrap;
+				max-width: 92%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.side-nav {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				width: 25%;
+				background: transparent;
+				border: none;
+				color: transparent;
+				cursor: pointer;
+			}
+			.side-nav.left {
+				left: 0;
+			}
+			.side-nav.right {
+				right: 0;
+			}
+
+			.nav-arrow {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				background: rgba(255, 255, 255, 0.3);
+				border: none;
+				color: #fff;
+				width: 44px;
+				height: 44px;
+				border-radius: 50%;
+				font-size: 1.2rem;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.nav-arrow.left {
+				left: 10px;
+			}
+			.nav-arrow.right {
+				right: 10px;
+			}
+			.nav-arrow:active {
+				background: rgba(255, 255, 255, 0.5);
+			}
+
+			.progress-wrap {
+				padding: 6px 18px 20px;
+				flex-shrink: 0;
+			}
+			.progress-bar {
+				height: 6px;
+				width: 100%;
+				background: rgba(255, 255, 255, 0.28);
+				border-radius: 6px;
+				overflow: hidden;
+			}
+			.progress-fill {
+				height: 100%;
+				background: #fff;
+				border-radius: 6px;
+				width: 0%;
+				transition: width 0.25s ease;
+			}
+			.progress-caption {
+				text-align: center;
+				font-size: 0.72rem;
+				font-weight: 800;
+				opacity: 0.85;
+				margin-top: 6px;
+				letter-spacing: 0.3px;
+			}
+			.vletter {
+				background: rgba(255, 255, 255, 0.3);
+				padding: 1px 9px;
+				border-radius: 8px;
+				margin-right: 6px;
+			}
+
+			/* ---------- SEARCH BAR (home, thesaurus) ---------- */
+			.search-wrap {
+				position: relative;
+				margin: 0 4px 16px;
+			}
+			.search-wrap input {
+				width: 100%;
+				border: none;
+				border-radius: 20px;
+				padding: 14px 44px 14px 46px;
+				font-family: 'Nunito';
+				font-weight: 700;
+				font-size: 1rem;
+				color: var(--ink);
+				background: #fff;
+				box-shadow:
+					0 3px 0 rgba(0, 0, 0, 0.06),
+					0 4px 10px rgba(0, 0, 0, 0.06);
+				outline: none;
+			}
+			.search-wrap .s-icon {
+				position: absolute;
+				left: 16px;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 1.1rem;
+				opacity: 0.7;
+			}
+			.search-wrap .s-clear {
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				border: none;
+				background: #eee;
+				color: #888;
+				border-radius: 50%;
+				width: 26px;
+				height: 26px;
+				cursor: pointer;
+				font-weight: 800;
+				display: none;
+			}
+			.search-wrap .s-clear.show {
+				display: block;
+			}
+			#searchResults {
+				display: none;
+			}
+			#searchResults.show {
+				display: block;
+			}
+			.sr-count {
+				font-weight: 800;
+				color: #8a80b8;
+				font-size: 0.85rem;
+				padding: 0 6px 8px;
+			}
+
+			/* ---------- PLAY (autoplay) + PHOTO toggle buttons ---------- */
+			.viewer-play {
+				background: rgba(255, 255, 255, 0.25);
+				border: none;
+				color: #fff;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				font-size: 1.15rem;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+			.viewer-play:active {
+				background: rgba(255, 255, 255, 0.45);
+				transform: scale(0.92);
+			}
+			.viewer-play.playing {
+				background: #fff;
+				color: #ff6b6b;
+			}
+			/* ---------- HOME: GROUPED CATEGORY WORLDS ---------- */
+			.home-action.alphabet {
+				background: linear-gradient(135deg, #ffa652, #ff8c42);
+			}
+			.group {
+				margin: 0 4px 22px;
+			}
+			.group-head {
+				display: flex;
+				align-items: center;
+				gap: 9px;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.2rem;
+				color: var(--ink);
+				margin: 0 4px 12px;
+			}
+			.group-head .gh-emoji img.twe {
+				width: 1.35em;
+				height: 1.35em;
+				vertical-align: -0.32em;
+			}
+			.cat-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 12px;
+			}
+			@media (min-width: 700px) {
+				.cat-grid {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
+			@media (min-width: 960px) {
+				.cat-grid {
+					grid-template-columns: repeat(4, 1fr);
+				}
+			}
+			.cat-card {
+				background: var(--paper);
+				border: none;
+				border-radius: 22px;
+				padding: 16px 12px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				box-shadow:
+					0 4px 0 rgba(0, 0, 0, 0.07),
+					0 6px 14px rgba(0, 0, 0, 0.08);
+				transition: transform 0.1s ease;
+			}
+			.cat-card:active {
+				transform: scale(0.95);
+			}
+			.cat-card .ci {
+				width: 66px;
+				height: 66px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+			}
+			.cat-card .ci img.twe {
+				width: 40px;
+				height: 40px;
+			}
+			.cat-card .cl {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 0.98rem;
+				text-align: center;
+				color: var(--ink);
+				line-height: 1.1;
+			}
+			.cat-card .cn {
+				font-size: 0.72rem;
+				font-weight: 800;
+				color: #9a90c2;
+			}
+
+			/* ---------- CATEGORY DETAIL: PICTURE-TILE GRID ---------- */
+			.word-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 12px;
+			}
+			@media (min-width: 600px) {
+				.word-grid {
+					grid-template-columns: repeat(3, 1fr);
+				}
+			}
+			@media (min-width: 900px) {
+				.word-grid {
+					grid-template-columns: repeat(4, 1fr);
+				}
+			}
+			@media (min-width: 1200px) {
+				.word-grid {
+					grid-template-columns: repeat(5, 1fr);
+				}
+			}
+			.word-card {
+				position: relative;
+				background: var(--paper);
+				border: none;
+				border-radius: 20px;
+				padding: 16px 8px 12px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				box-shadow:
+					0 4px 0 rgba(0, 0, 0, 0.06),
+					0 5px 12px rgba(0, 0, 0, 0.07);
+				transition: transform 0.1s ease;
+			}
+			.word-card:active {
+				transform: scale(0.95);
+			}
+			.word-card .wc-img {
+				width: 92px;
+				height: 92px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			.word-card .wc-img img.twe {
+				width: 92px;
+				height: 92px;
+				filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.14));
+			}
+			.word-card .wc-word {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 0.95rem;
+				color: var(--ink);
+				text-align: center;
+				line-height: 1.1;
+			}
+			.word-card .wc-letter {
+				position: absolute;
+				top: 8px;
+				left: 8px;
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				color: #fff;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 0.75rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+			/* Alphabet screen reuses letter-grid; give its topbar a default look */
+			#alphaTopbar {
+				background: linear-gradient(135deg, #ffa652, #ff8c42);
+			}
+
+			/* ---------- REAL PHOTO override (produce that has no emoji) ---------- */
+			img.pic-img {
+				object-fit: cover;
+				background: #fff;
+				border-radius: 14px;
+			}
+			.word-card .wc-img img.pic-img {
+				width: 92px;
+				height: 92px;
+			}
+			.flashcard .big-emoji img.pic-img {
+				width: min(66vw, 340px);
+				height: min(66vw, 340px);
+				border-radius: 26px;
+				box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+			}
+			.quiz-opt img.pic-img {
+				width: min(22vw, 110px);
+				height: min(22vw, 110px);
+				border-radius: 16px;
+			}
+			.word-row .wr-emoji img.pic-img {
+				width: 1.9em;
+				height: 1.9em;
+				border-radius: 7px;
+			}
+			.cat-tile .preview img.pic-img {
+				width: 2em;
+				height: 2em;
+			}
+
+			/* ---------- REVIEW / VALIDATE MODE ---------- */
+			.home-actions {
+				flex-wrap: wrap;
+			}
+			.home-action {
+				flex: 1 1 42%;
+			}
+			.home-action.review {
+				background: linear-gradient(135deg, #9d8df1, #7b6ef0);
+			}
+			#review-screen {
+				display: none;
+				color: #fff;
+				min-height: 100vh;
+			}
+			#reviewTop {
+				padding: 16px 14px 22px;
+				border-radius: 0 0 28px 28px;
+				box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+				background: linear-gradient(135deg, #9d8df1, #7b6ef0);
+			}
+			.review-body {
+				padding: 16px 14px 40px;
+			}
+			.rv-summary {
+				background: var(--paper);
+				border-radius: 18px;
+				padding: 12px 16px;
+				margin-bottom: 16px;
+				color: var(--ink);
+				font-weight: 700;
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.06);
+			}
+			.rv-cat {
+				background: var(--paper);
+				border-radius: 18px;
+				padding: 12px 14px;
+				margin-bottom: 12px;
+				color: var(--ink);
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.06);
+			}
+			.rv-cat-head {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.05rem;
+				margin-bottom: 4px;
+			}
+			.rv-cat-head .rv-badge {
+				margin-left: auto;
+				font-size: 0.78rem;
+				font-weight: 800;
+				padding: 3px 10px;
+				border-radius: 12px;
+			}
+			.rv-badge.ok {
+				background: #e5f9e8;
+				color: #2f9e44;
+			}
+			.rv-badge.warn {
+				background: #fff3d6;
+				color: #b8860b;
+			}
+			.rv-items {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+				gap: 10px;
+				margin-top: 8px;
+			}
+			.rv-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 4px;
+				font-size: 0.72rem;
+				font-weight: 700;
+				text-align: center;
+				color: var(--ink);
+			}
+			.rv-item .rv-pic {
+				width: 54px;
+				height: 54px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 12px;
+				background: #f4f1fb;
+				position: relative;
+			}
+			.rv-item .rv-pic img.twe {
+				width: 40px;
+				height: 40px;
+			}
+			.rv-item .rv-pic img.pic-img {
+				width: 54px;
+				height: 54px;
+			}
+			.rv-item.flag .rv-pic {
+				outline: 3px solid #ff9f45;
+				outline-offset: 1px;
+			}
+			.rv-item .rv-tag {
+				position: absolute;
+				top: -8px;
+				right: -8px;
+				font-size: 0.9rem;
+			}
+
+			/* ---------- QUIZ MODE ---------- */
+			#quiz-screen {
+				display: none;
+				color: #fff;
+				min-height: 100vh;
+			}
+			#quizTop {
+				padding: 16px 14px 22px;
+				border-radius: 0 0 28px 28px;
+				box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+			}
+			.quiz-body {
+				padding: 26px 16px 40px;
+				text-align: center;
+			}
+			.quiz-prompt {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.5rem;
+				color: var(--ink);
+				margin: 6px 0 4px;
+			}
+			.quiz-sub {
+				font-weight: 800;
+				color: #9a90c2;
+				font-size: 0.9rem;
+				margin-bottom: 22px;
+			}
+			.quiz-target-hear {
+				background: linear-gradient(135deg, #ff8fb1, #ff6b6b);
+				color: #fff;
+				border: none;
+				border-radius: 24px;
+				padding: 12px 26px;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1.05rem;
+				cursor: pointer;
+				box-shadow: 0 4px 0 rgba(255, 107, 107, 0.4);
+				margin-bottom: 26px;
+			}
+			.quiz-target-hear:active {
+				transform: translateY(2px);
+				box-shadow: 0 2px 0 rgba(255, 107, 107, 0.4);
+			}
+			.quiz-options {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 16px;
+				max-width: 520px;
+				margin: 0 auto;
+			}
+			.quiz-opt {
+				aspect-ratio: 1;
+				background: var(--paper);
+				border: 4px solid transparent;
+				border-radius: 26px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: min(22vw, 110px);
+				cursor: pointer;
+				box-shadow:
+					0 5px 0 rgba(0, 0, 0, 0.08),
+					0 6px 14px rgba(0, 0, 0, 0.08);
+				transition: transform 0.1s ease;
+			}
+			.quiz-opt:active {
+				transform: scale(0.95);
+			}
+			.quiz-opt.correct {
+				border-color: #6bcb77;
+				background: #eaffea;
+			}
+			.quiz-opt.wrong {
+				border-color: #ff6b6b;
+				background: #ffecec;
+				opacity: 0.7;
+			}
+			.quiz-opt img.twe {
+				width: min(22vw, 110px);
+				height: min(22vw, 110px);
+			}
+			.quiz-feedback {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				font-size: 1.3rem;
+				min-height: 34px;
+				margin: 22px 0 6px;
+				color: var(--ink);
+			}
+			.quiz-score {
+				font-weight: 800;
+				color: #9a90c2;
+			}
+			.quiz-next {
+				background: linear-gradient(135deg, #6bcb77, #4eb369);
+				color: #fff;
+				border: none;
+				border-radius: 24px;
+				padding: 13px 34px;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1.05rem;
+				cursor: pointer;
+				box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15);
+				margin-top: 14px;
+				visibility: hidden;
+			}
+			.quiz-next.show {
+				visibility: visible;
+			}
+			.quiz-next:active {
+				transform: translateY(2px);
+				box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+			}
+			.home-actions {
+				display: flex;
+				gap: 12px;
+				margin: 0 4px 18px;
+			}
+			.home-action {
+				flex: 1;
+				border: none;
+				border-radius: 20px;
+				padding: 15px 10px;
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1rem;
+				color: #fff;
+				box-shadow:
+					0 4px 0 rgba(0, 0, 0, 0.12),
+					0 6px 12px rgba(0, 0, 0, 0.1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+			}
+			.home-action:active {
+				transform: translateY(2px);
+			}
+			.home-action.quiz {
+				background: linear-gradient(135deg, #6bcb77, #4eb369);
+			}
+			.home-action.slideshow {
+				background: linear-gradient(135deg, #4d96ff, #5da3fa);
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				.letter-btn,
+				.cat-tile,
+				.big-letter,
+				.flashcard {
+					transition: none;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<!-- HOME SCREEN -->
+			<div id="home-screen">
+				<div class="hero">
+					<h1>🌈 ABC Adventure</h1>
+					<p>Pick a picture world to explore!</p>
+				</div>
+				<div class="search-wrap">
+					<span class="s-icon">🔍</span>
+					<input id="searchInput" type="text" placeholder="Search any word… (apple, tiger, red)" autocomplete="off" aria-label="Search words" />
+					<button class="s-clear" id="searchClear" aria-label="Clear search">✕</button>
+				</div>
+				<div id="searchResults"></div>
+				<div class="home-actions" id="homeActions">
+					<button class="home-action quiz" id="startQuizBtn">🎯 Quiz</button>
+					<button class="home-action slideshow" id="startSlideshowBtn">🎬 Slideshow</button>
+					<button class="home-action alphabet" id="openAlphabetBtn">🔤 A–Z</button>
+					<button class="home-action review" id="openReviewBtn">🔎 Review</button>
+				</div>
+				<div id="groupSections"></div>
+			</div>
+
+			<!-- ALPHABET SCREEN (A–Z letter grid, now its own screen) -->
+			<div id="alphabet-screen" style="display: none">
+				<div class="topbar" id="alphaTopbar">
+					<div class="topbar-row">
+						<button class="icon-btn" id="alphaHomeBtn" aria-label="Home">🏠</button>
+						<div class="big-letter-wrap">
+							<div class="letter-caption" style="font-size: 1.15rem">🔤 Alphabet · A to Z</div>
+						</div>
+						<span style="width: 42px"></span>
+					</div>
+				</div>
+				<div class="content">
+					<div class="letter-grid" id="letterGrid"></div>
+					<p class="footnote">👆 Tap a letter to see its words!</p>
+				</div>
+			</div>
+
+			<!-- CATEGORY DETAIL SCREEN (all letters, one category) -->
+			<div id="category-screen" style="display: none">
+				<div class="topbar" id="catTopbar">
+					<div class="topbar-row">
+						<button class="icon-btn" id="catHomeBtn" aria-label="Home">🏠</button>
+						<button class="icon-btn" id="catPrevBtn" aria-label="Previous category">◀</button>
+						<div class="big-letter-wrap">
+							<div class="big-letter" id="catBigIcon" style="font-size: 2.1rem">🍎</div>
+							<div class="letter-caption" id="catCaption">Fruits</div>
+						</div>
+						<button class="icon-btn" id="catNextBtn" aria-label="Next category">▶</button>
+						<button class="icon-btn" id="catPlayBtn" aria-label="Play all">▶️</button>
+					</div>
+				</div>
+				<div class="content" id="catContent"></div>
+			</div>
+
+			<!-- LETTER SCREEN -->
+			<div id="letter-screen">
+				<div class="topbar" id="topbar">
+					<div class="topbar-row">
+						<button class="icon-btn" id="homeBtn" aria-label="Home">🏠</button>
+						<button class="icon-btn" id="prevBtn" aria-label="Previous letter">◀</button>
+						<div class="big-letter-wrap">
+							<div class="big-letter" id="bigLetter">A</div>
+							<div class="letter-caption" id="letterCaption">12 categories</div>
+						</div>
+						<button class="icon-btn" id="nextBtn" aria-label="Next letter">▶</button>
+						<button class="icon-btn" id="soundBtn" aria-label="Hear letter">🔊</button>
+					</div>
+				</div>
+				<div class="content" id="content"></div>
+			</div>
+
+			<!-- FULLSCREEN FLASHCARD VIEWER -->
+			<div id="viewer">
+				<div class="viewer-header">
+					<button class="viewer-close" id="viewerClose" aria-label="Close">✕</button>
+					<div class="vinfo">
+						<div class="vlabel" id="viewerLabel"></div>
+						<div class="vcount" id="viewerCount"></div>
+					</div>
+					<button class="viewer-play" id="viewerPlay" aria-label="Auto-play slideshow">▶️</button>
+					<button class="viewer-hear" id="viewerHear" aria-label="Hear word">🔊</button>
+				</div>
+				<div class="viewer-stage" id="viewerStage">
+					<button class="side-nav left" id="sideLeft" aria-label="Previous"></button>
+					<button class="side-nav right" id="sideRight" aria-label="Next"></button>
+					<button class="nav-arrow left" id="arrowLeft">◀</button>
+					<button class="nav-arrow right" id="arrowRight">▶</button>
+				</div>
+				<div class="progress-wrap">
+					<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+					<div class="progress-caption" id="progressCaption"></div>
+				</div>
+			</div>
+
+			<!-- QUIZ SCREEN -->
+			<div id="quiz-screen">
+				<div class="topbar" id="quizTop">
+					<div class="topbar-row">
+						<button class="icon-btn" id="quizHomeBtn" aria-label="Home">🏠</button>
+						<div class="big-letter-wrap">
+							<div class="letter-caption" style="font-size: 1.1rem">🎯 Find the word!</div>
+						</div>
+						<button class="icon-btn" id="quizReplayBtn" aria-label="Hear again">🔊</button>
+					</div>
+				</div>
+				<div class="quiz-body">
+					<div class="quiz-prompt" id="quizPrompt">Which one is…</div>
+					<div class="quiz-sub" id="quizSub"></div>
+					<button class="quiz-target-hear" id="quizTargetHear">🔊 <span id="quizTargetWord">Apple</span></button>
+					<div class="quiz-options" id="quizOptions"></div>
+					<div class="quiz-feedback" id="quizFeedback"></div>
+					<div class="quiz-score" id="quizScore"></div>
+					<button class="quiz-next" id="quizNextBtn">Next ▶</button>
+				</div>
+			</div>
+
+			<!-- REVIEW / VALIDATE SCREEN -->
+			<div id="review-screen">
+				<div class="topbar" id="reviewTop">
+					<div class="topbar-row">
+						<button class="icon-btn" id="reviewHomeBtn" aria-label="Home">🏠</button>
+						<div class="big-letter-wrap">
+							<div class="letter-caption" style="font-size: 1.15rem">🔎 Picture Review</div>
+						</div>
+						<span style="width: 42px"></span>
+					</div>
+				</div>
+				<div class="review-body" id="reviewBody"></div>
+			</div>
+		</div>
+
+		<script>
+			/* ================= DATA ================= */
+			const DATA = {
+				A: {
+					fruits: [
+						['Apple', '🍎'],
+						['Apricot', '🟠'],
+						['Avocado', '🥑']
+					],
+					vegetables: [
+						['Artichoke', '�'],
+						['Asparagus', '🌿']
+					],
+					animals: [
+						['Ant', '🐜'],
+						['Alligator', '🐊'],
+						['Alpaca', '🦙']
+					],
+					vehicles: [
+						['Airplane', '✈️'],
+						['Ambulance', '🚑']
+					],
+					food: [
+						['Apple Pie', '🥧'],
+						['Almonds', '🌰']
+					],
+					colors: [
+						['Amber', '🟠'],
+						['Aqua', '🩵']
+					],
+					shapes: [],
+					directions: [
+						['Above', '⬆️'],
+						['Ahead', '➡️']
+					],
+					family: [['Aunt', '👩']],
+					festivals: [],
+					jobs: [
+						['Actor', '🎭'],
+						['Artist', '🎨'],
+						['Architect', '📐']
+					],
+					business: [['Airline', '✈️']],
+					religion: [],
+					birds: [],
+					body: [
+						['Arm', '💪'],
+						['Ankle', '🦶']
+					],
+					nature: [['Air', '💨']]
+				},
+				B: {
+					fruits: [
+						['Banana', '🍌'],
+						['Blueberry', '🫐']
+					],
+					vegetables: [
+						['Beans', '🫘'],
+						['Broccoli', '🥦'],
+						['Brinjal', '🍆'],
+						['Bell Pepper', '🫑']
+					],
+					animals: [
+						['Bear', '🐻'],
+						['Bat', '🦇'],
+						['Bee', '🐝'],
+						['Butterfly', '🦋'],
+						['Bull', '🐂']
+					],
+					vehicles: [
+						['Bus', '🚌'],
+						['Bicycle', '🚲'],
+						['Boat', '⛵'],
+						['Bike', '🏍️']
+					],
+					food: [
+						['Bread', '🍞'],
+						['Butter', '🧈'],
+						['Biscuit', '🍪']
+					],
+					colors: [
+						['Black', '⚫'],
+						['Blue', '🔵'],
+						['Brown', '🟤']
+					],
+					shapes: [],
+					directions: [
+						['Back', '⬅️'],
+						['Behind', '👈'],
+						['Below', '⬇️'],
+						['Between', '↔️']
+					],
+					family: [
+						['Brother', '👦'],
+						['Baby', '👶']
+					],
+					festivals: [['Birthday', '🎂']],
+					jobs: [
+						['Baker', '🧑‍🍳'],
+						['Barber', '💈'],
+						['Builder', '👷']
+					],
+					business: [
+						['Bakery', '🥐'],
+						['Bank', '🏦']
+					],
+					religion: [['Buddhism', '☸️']],
+					birds: [],
+					body: [['Back', '🦴']],
+					nature: [
+						['Breeze', '🍃'],
+						['Beach', '🏖️']
+					]
+				},
+				C: {
+					fruits: [
+						['Cherry', '🍒'],
+						['Coconut', '🥥'],
+						['Cantaloupe', '🍈']
+					],
+					vegetables: [
+						['Carrot', '🥕'],
+						['Cabbage', '🥬'],
+						['Cauliflower', '⚪'],
+						['Corn', '🌽'],
+						['Cucumber', '🥒'],
+						['Capsicum', '🫑']
+					],
+					animals: [
+						['Cat', '🐈'],
+						['Cow', '🐄'],
+						['Camel', '🐫'],
+						['Crab', '🦀'],
+						['Chicken', '🐔']
+					],
+					vehicles: [
+						['Car', '🚗'],
+						['Canoe', '🛶']
+					],
+					food: [
+						['Cheese', '🧀'],
+						['Cake', '🍰'],
+						['Cookie', '🍪'],
+						['Curry', '🍛'],
+						['Chapati', '🫓']
+					],
+					colors: [
+						['Crimson', '🔴'],
+						['Cyan', '🩵']
+					],
+					shapes: [
+						['Circle', '⚪'],
+						['Cone', '🔺'],
+						['Cube', '🧊']
+					],
+					directions: [],
+					family: [['Cousin', '🧑']],
+					festivals: [
+						['Christmas', '🎄'],
+						['Carnival', '🎪']
+					],
+					jobs: [
+						['Chef', '👨‍🍳'],
+						['Carpenter', '🪚'],
+						['Cashier', '🧾']
+					],
+					business: [['Café', '☕']],
+					religion: [['Christianity', '✝️']],
+					birds: [['Crow', '🐦‍⬛']],
+					body: [
+						['Cheek', '😊'],
+						['Chest', '🫁'],
+						['Chin', '🙂']
+					],
+					nature: [['Cloud', '☁️']]
+				},
+				D: {
+					fruits: [
+						['Date', '🌴'],
+						['Dragon Fruit', '🐉']
+					],
+					vegetables: [],
+					animals: [
+						['Dog', '🐕'],
+						['Deer', '🦌'],
+						['Dolphin', '🐬'],
+						['Duck', '🦆']
+					],
+					vehicles: [['Dumper Truck', '🚛']],
+					food: [
+						['Dosa', '🟤'],
+						['Dal', '🟨'],
+						['Donut', '🍩']
+					],
+					colors: [],
+					shapes: [['Diamond', '🔷']],
+					directions: [['Down', '⬇️']],
+					family: [
+						['Daughter', '👧'],
+						['Dad', '👨']
+					],
+					festivals: [
+						['Diwali', '🪔'],
+						['Dussehra', '🏹']
+					],
+					jobs: [
+						['Dentist', '🦷'],
+						['Doctor', '🩺'],
+						['Driver', '🚕'],
+						['Designer', '🖌️']
+					],
+					business: [['Dairy Shop', '🥛']],
+					religion: [],
+					birds: [
+						['Dove', '🕊️'],
+						['Duck', '🦆']
+					],
+					body: [],
+					nature: [['Desert', '🏜️']]
+				},
+				E: {
+					fruits: [['Elderberry', '⚫']],
+					vegetables: [['Eggplant', '🍆']],
+					animals: [
+						['Elephant', '🐘'],
+						['Eagle', '🦅']
+					],
+					vehicles: [],
+					food: [['Éclair', '🥐']],
+					colors: [],
+					shapes: [],
+					directions: [['East', '🧭']],
+					family: [],
+					festivals: [
+						['Easter', '🐣'],
+						['Eid', '🌙']
+					],
+					jobs: [
+						['Engineer', '⚙️'],
+						['Electrician', '💡']
+					],
+					business: [],
+					religion: [],
+					birds: [['Eagle', '🦅']],
+					body: [
+						['Ear', '👂'],
+						['Elbow', '💪'],
+						['Eye', '👁️'],
+						['Eyebrow', '🤨']
+					],
+					nature: [['Earth', '🌍']]
+				},
+				F: {
+					fruits: [['Fig', '🟤']],
+					vegetables: [],
+					animals: [
+						['Fish', '🐟'],
+						['Fox', '🦊'],
+						['Frog', '🐸']
+					],
+					vehicles: [
+						['Fire Truck', '🚒'],
+						['Ferry', '⛴️']
+					],
+					food: [
+						['French Fries', '🍟'],
+						['Fruit Salad', '🍇']
+					],
+					colors: [],
+					shapes: [],
+					directions: [
+						['Forward', '➡️'],
+						['Front', '👉']
+					],
+					family: [
+						['Family', '👨‍👩‍👧‍👦'],
+						['Father', '👨']
+					],
+					festivals: [],
+					jobs: [
+						['Farmer', '🧑‍🌾'],
+						['Firefighter', '🧑‍🚒']
+					],
+					business: [
+						['Farm', '🚜'],
+						['Factory', '🏭']
+					],
+					religion: [],
+					birds: [['Flamingo', '🦩']],
+					body: [
+						['Finger', '👆'],
+						['Foot', '🦶'],
+						['Forehead', '🧑']
+					],
+					nature: [
+						['Forest', '🌲'],
+						['Fog', '🌫️'],
+						['Flower', '🌸']
+					]
+				},
+				G: {
+					fruits: [
+						['Grape', '🍇'],
+						['Guava', '🟢']
+					],
+					vegetables: [
+						['Garlic', '🧄'],
+						['Ginger', '🫚'],
+						['Green Beans', '🟢']
+					],
+					animals: [
+						['Giraffe', '🦒'],
+						['Goat', '🐐'],
+						['Gorilla', '🦍']
+					],
+					vehicles: [],
+					food: [['Grilled Cheese', '🟡']],
+					colors: [
+						['Gold', '🟡'],
+						['Green', '🟢'],
+						['Gray', '⚪']
+					],
+					shapes: [],
+					directions: [],
+					family: [
+						['Grandmother', '👵'],
+						['Grandfather', '👴'],
+						['Grandson', '🧒']
+					],
+					festivals: [['Ganesh Chaturthi', '🐘']],
+					jobs: [['Gardener', '🧑‍🌾']],
+					business: [
+						['Grocery Store', '🛒'],
+						['Garage', '🚗']
+					],
+					religion: [],
+					birds: [['Goose', '🪿']],
+					body: [],
+					nature: [['Grass', '🌱']]
+				},
+				H: {
+					fruits: [['Honeydew Melon', '🟡']],
+					vegetables: [],
+					animals: [
+						['Horse', '🐎'],
+						['Hippo', '🦛'],
+						['Hedgehog', '🦔']
+					],
+					vehicles: [['Helicopter', '🚁']],
+					food: [
+						['Honey', '🍯'],
+						['Hummus', '🧆']
+					],
+					colors: [],
+					shapes: [
+						['Heart', '❤️'],
+						['Hexagon', '🔶']
+					],
+					directions: [],
+					family: [['Husband', '🤵']],
+					festivals: [
+						['Halloween', '🎃'],
+						['Holi', '🎨'],
+						['Hanukkah', '🕎']
+					],
+					jobs: [['Hairdresser', '💇']],
+					business: [['Hardware Store', '🔨']],
+					religion: [['Hinduism', '🕉️']],
+					birds: [],
+					body: [
+						['Hand', '✋'],
+						['Head', '🗣️'],
+						['Heart', '❤️'],
+						['Hip', '🕺']
+					],
+					nature: [['Hill', '⛰️']]
+				},
+				I: {
+					fruits: [['Indian Gooseberry', '🫒']],
+					vegetables: [],
+					animals: [['Iguana', '🦎']],
+					vehicles: [],
+					food: [
+						['Ice Cream', '🍦'],
+						['Idli', '🍙']
+					],
+					colors: [
+						['Indigo', '🟣'],
+						['Ivory', '⚪']
+					],
+					shapes: [],
+					directions: [
+						['Inside', '📦'],
+						['In', '➡️']
+					],
+					family: [],
+					festivals: [],
+					jobs: [],
+					business: [],
+					religion: [['Islam', '☪️']],
+					birds: [],
+					body: [],
+					nature: [['Ice', '🧊']]
+				},
+				J: {
+					fruits: [
+						['Jackfruit', '🟨'],
+						['Jamun', '🟣']
+					],
+					vegetables: [],
+					animals: [
+						['Jaguar', '🐆'],
+						['Jellyfish', '🪼']
+					],
+					vehicles: [
+						['Jeep', '🚙'],
+						['Jet', '🛩️']
+					],
+					food: [
+						['Jam', '🍓'],
+						['Juice', '🧃']
+					],
+					colors: [],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [],
+					jobs: [
+						['Judge', '⚖️'],
+						['Journalist', '📰']
+					],
+					business: [['Jewelry Store', '💍']],
+					religion: [
+						['Jainism', '☸️'],
+						['Judaism', '✡️']
+					],
+					birds: [],
+					body: [],
+					nature: [['Jungle', '🌴']]
+				},
+				K: {
+					fruits: [['Kiwi', '🥝']],
+					vegetables: [['Kale', '🌿']],
+					animals: [
+						['Kangaroo', '🦘'],
+						['Koala', '🐨']
+					],
+					vehicles: [['Kayak', '🚣']],
+					food: [
+						['Ketchup', '🍅'],
+						['Khichdi', '🟧']
+					],
+					colors: [],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [['Karva Chauth', '🌙']],
+					jobs: [],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [
+						['Knee', '🦵'],
+						['Knuckle', '✊']
+					],
+					nature: []
+				},
+				L: {
+					fruits: [
+						['Lemon', '🍋'],
+						['Lychee', '🔴'],
+						['Lime', '🍏']
+					],
+					vegetables: [
+						['Lettuce', '🍃'],
+						['Leek', '🌱']
+					],
+					animals: [
+						['Lion', '🦁'],
+						['Ladybug', '🐞'],
+						['Leopard', '🐆']
+					],
+					vehicles: [],
+					food: [
+						['Lasagna', '🍱'],
+						['Lentil Soup', '🟠']
+					],
+					colors: [['Lavender', '💜']],
+					shapes: [],
+					directions: [['Left', '⬅️']],
+					family: [],
+					festivals: [],
+					jobs: [
+						['Lawyer', '👩‍⚖️'],
+						['Librarian', '📚']
+					],
+					business: [['Laundry', '🧺']],
+					religion: [],
+					birds: [],
+					body: [
+						['Leg', '🦵'],
+						['Lip', '👄']
+					],
+					nature: [
+						['Leaf', '🍁'],
+						['Lake', '🏞️']
+					]
+				},
+				M: {
+					fruits: [
+						['Mango', '🥭'],
+						['Mangosteen', '🟪'],
+						['Mulberry', '🟫']
+					],
+					vegetables: [['Mushroom', '🍄']],
+					animals: [
+						['Monkey', '🐒'],
+						['Mouse', '🐁'],
+						['Moose', '🫎']
+					],
+					vehicles: [['Motorcycle', '🏍️']],
+					food: [
+						['Milk', '🥛'],
+						['Muffin', '🧁'],
+						['Momos', '🥟']
+					],
+					colors: [
+						['Magenta', '🟣'],
+						['Maroon', '🟤']
+					],
+					shapes: [],
+					directions: [],
+					family: [
+						['Mother', '👩'],
+						['Mom', '🤱']
+					],
+					festivals: [],
+					jobs: [
+						['Mechanic', '🔧'],
+						['Musician', '🎵']
+					],
+					business: [
+						['Market', '🏪'],
+						['Mall', '🏬']
+					],
+					religion: [],
+					birds: [],
+					body: [['Mouth', '👄']],
+					nature: [
+						['Moon', '🌙'],
+						['Mountain', '⛰️'],
+						['Mud', '🟤']
+					]
+				},
+				N: {
+					fruits: [['Nectarine', '🧡']],
+					vegetables: [],
+					animals: [['Narwhal', '🐳']],
+					vehicles: [],
+					food: [
+						['Noodles', '🍜'],
+						['Naan', '🟫']
+					],
+					colors: [['Navy', '🔵']],
+					shapes: [],
+					directions: [['North', '⬆️']],
+					family: [
+						['Nephew', '👦'],
+						['Niece', '👧']
+					],
+					festivals: [
+						['New Year', '🎆'],
+						['Navratri', '💃']
+					],
+					jobs: [['Nurse', '👩‍⚕️']],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [
+						['Nail', '💅'],
+						['Neck', '🦒'],
+						['Nose', '👃']
+					],
+					nature: [['Nest', '🪺']]
+				},
+				O: {
+					fruits: [['Orange', '🍊']],
+					vegetables: [
+						['Onion', '🧅'],
+						['Okra', '🫒']
+					],
+					animals: [
+						['Owl', '🦉'],
+						['Octopus', '🐙'],
+						['Orangutan', '🦧']
+					],
+					vehicles: [],
+					food: [['Oatmeal', '🥣']],
+					colors: [
+						['Orange', '🟠'],
+						['Olive', '🫒']
+					],
+					shapes: [['Oval', '🥚']],
+					directions: [
+						['Outside', '🏞️'],
+						['Over', '⬆️'],
+						['On', '🔛']
+					],
+					family: [],
+					festivals: [['Onam', '🛶']],
+					jobs: [['Officer', '👮']],
+					business: [],
+					religion: [],
+					birds: [
+						['Owl', '🦉'],
+						['Ostrich', '🦤']
+					],
+					body: [],
+					nature: [['Ocean', '🌊']]
+				},
+				P: {
+					fruits: [
+						['Papaya', '🟧'],
+						['Peach', '🍑'],
+						['Pear', '🍐'],
+						['Pineapple', '🍍'],
+						['Plum', '🔵'],
+						['Pomegranate', '🟥']
+					],
+					vegetables: [
+						['Peas', '🫛'],
+						['Potato', '🥔'],
+						['Pumpkin', '🎃']
+					],
+					animals: [
+						['Pig', '🐖'],
+						['Panda', '🐼'],
+						['Parrot', '🦜'],
+						['Peacock', '🦚'],
+						['Penguin', '🐧']
+					],
+					vehicles: [['Plane', '✈️']],
+					food: [
+						['Pancake', '🥞'],
+						['Pasta', '🍝'],
+						['Pizza', '🍕'],
+						['Popcorn', '🍿'],
+						['Paneer', '⬜']
+					],
+					colors: [
+						['Pink', '🩷'],
+						['Purple', '🟣'],
+						['Peach', '🍑']
+					],
+					shapes: [['Pentagon', '🔷']],
+					directions: [],
+					family: [['Parent', '👪']],
+					festivals: [['Pongal', '🌾']],
+					jobs: [
+						['Painter', '🎨'],
+						['Pilot', '✈️'],
+						['Plumber', '🔧'],
+						['Photographer', '📷']
+					],
+					business: [
+						['Pharmacy', '💊'],
+						['Post Office', '📮']
+					],
+					religion: [],
+					birds: [
+						['Parrot', '🦜'],
+						['Peacock', '🦚'],
+						['Penguin', '🐧']
+					],
+					body: [],
+					nature: [
+						['Plant', '🌱'],
+						['Pond', '🪷'],
+						['Puddle', '💧']
+					]
+				},
+				Q: {
+					fruits: [['Quince', '🍐']],
+					vegetables: [],
+					animals: [
+						['Quail', '🐦'],
+						['Quokka', '🐹']
+					],
+					vehicles: [],
+					food: [['Quesadilla', '🥙']],
+					colors: [],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [],
+					jobs: [['Queen', '👑']],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [],
+					nature: []
+				},
+				R: {
+					fruits: [['Raspberry', '🔴']],
+					vegetables: [['Radish', '🔴']],
+					animals: [
+						['Rabbit', '🐇'],
+						['Rat', '🐀'],
+						['Rhino', '🦏']
+					],
+					vehicles: [
+						['Rocket', '🚀'],
+						['Rickshaw', '🛺']
+					],
+					food: [
+						['Rice', '🍚'],
+						['Roti', '🫓']
+					],
+					colors: [['Red', '🔴']],
+					shapes: [['Rectangle', '▭']],
+					directions: [['Right', '➡️']],
+					family: [],
+					festivals: [
+						['Raksha Bandhan', '🧵'],
+						['Ramadan', '🌙']
+					],
+					jobs: [],
+					business: [['Restaurant', '🍽️']],
+					religion: [],
+					birds: [['Rooster', '🐓']],
+					body: [],
+					nature: [
+						['Rain', '🌧️'],
+						['Rainbow', '🌈'],
+						['River', '🏞️'],
+						['Rock', '🪨']
+					]
+				},
+				S: {
+					fruits: [['Strawberry', '🍓']],
+					vegetables: [
+						['Spinach', '🟩'],
+						['Sweet Potato', '🍠'],
+						['Squash', '🟠']
+					],
+					animals: [
+						['Snake', '🐍'],
+						['Sheep', '🐑'],
+						['Squirrel', '🐿️'],
+						['Snail', '🐌']
+					],
+					vehicles: [
+						['Ship', '🚢'],
+						['Scooter', '🛵'],
+						['Submarine', '🚤'],
+						['Skateboard', '🛹'],
+						['Sled', '🛷']
+					],
+					food: [
+						['Salad', '🥗'],
+						['Sandwich', '🥪'],
+						['Soup', '🍲'],
+						['Samosa', '🔺'],
+						['Smoothie', '🥤']
+					],
+					colors: [['Silver', '⚪']],
+					shapes: [
+						['Square', '🟦'],
+						['Star', '⭐'],
+						['Sphere', '🌐']
+					],
+					directions: [
+						['South', '⬇️'],
+						['Sideways', '↔️']
+					],
+					family: [
+						['Sister', '👧'],
+						['Son', '👦'],
+						['Stepmother', '👩']
+					],
+					festivals: [],
+					jobs: [
+						['Scientist', '🧑‍🔬'],
+						['Singer', '🎤'],
+						['Soldier', '🪖']
+					],
+					business: [
+						['Salon', '💇'],
+						['Supermarket', '🛒']
+					],
+					religion: [['Sikhism', '☬']],
+					birds: [['Swan', '🦢']],
+					body: [
+						['Shoulder', '💪'],
+						['Stomach', '🫃']
+					],
+					nature: [
+						['Sky', '🌤️'],
+						['Snow', '❄️'],
+						['Sun', '☀️'],
+						['Sand', '🏖️'],
+						['Stone', '🪨'],
+						['Storm', '⛈️']
+					]
+				},
+				T: {
+					fruits: [['Tangerine', '🔶']],
+					vegetables: [
+						['Tomato', '🍅'],
+						['Turnip', '🟣']
+					],
+					animals: [
+						['Tiger', '🐅'],
+						['Turtle', '🐢'],
+						['Turkey', '🦃']
+					],
+					vehicles: [
+						['Train', '🚂'],
+						['Truck', '🚚'],
+						['Taxi', '🚕'],
+						['Tractor', '🚜'],
+						['Tram', '🚋']
+					],
+					food: [
+						['Toast', '🍞'],
+						['Tacos', '🌮']
+					],
+					colors: [
+						['Teal', '🩵'],
+						['Turquoise', '🔵']
+					],
+					shapes: [['Triangle', '🔺']],
+					directions: [
+						['Top', '⬆️'],
+						['Through', '➡️']
+					],
+					family: [],
+					festivals: [['Thanksgiving', '🦃']],
+					jobs: [
+						['Teacher', '👩‍🏫'],
+						['Tailor', '🧵']
+					],
+					business: [['Toy Store', '🧸']],
+					religion: [],
+					birds: [['Turkey', '🦃']],
+					body: [
+						['Thumb', '👍'],
+						['Toe', '🦶'],
+						['Tongue', '👅'],
+						['Tooth', '🦷']
+					],
+					nature: [
+						['Tree', '🌳'],
+						['Thunder', '⚡']
+					]
+				},
+				U: {
+					fruits: [['Ugli Fruit', '💚']],
+					vegetables: [],
+					animals: [['Unicorn', '🦄']],
+					vehicles: [],
+					food: [['Upma', '⚪']],
+					colors: [],
+					shapes: [],
+					directions: [
+						['Up', '⬆️'],
+						['Under', '⬇️']
+					],
+					family: [['Uncle', '👨']],
+					festivals: [],
+					jobs: [],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [],
+					nature: [['Umbrella', '☂️']]
+				},
+				V: {
+					fruits: [],
+					vegetables: [],
+					animals: [['Vulture', '🐦‍⬛']],
+					vehicles: [['Van', '🚐']],
+					food: [
+						['Vada', '⭕'],
+						['Vegetable Soup', '🟢']
+					],
+					colors: [['Violet', '🟣']],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [["Valentine's Day", '💝']],
+					jobs: [['Vet', '👩‍⚕️']],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [],
+					nature: [
+						['Volcano', '🌋'],
+						['Valley', '🏞️']
+					]
+				},
+				W: {
+					fruits: [['Watermelon', '🍉']],
+					vegetables: [],
+					animals: [
+						['Whale', '🐋'],
+						['Wolf', '🐺'],
+						['Walrus', '🦭']
+					],
+					vehicles: [['Wagon', '🛒']],
+					food: [['Waffle', '🧇']],
+					colors: [['White', '⚪']],
+					shapes: [],
+					directions: [['West', '⬅️']],
+					family: [['Wife', '👰']],
+					festivals: [],
+					jobs: [
+						['Waiter', '🧑‍🍽️'],
+						['Writer', '✍️']
+					],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [
+						['Waist', '🧍'],
+						['Wrist', '✋']
+					],
+					nature: [
+						['Water', '💧'],
+						['Wind', '💨'],
+						['Wave', '🌊'],
+						['Waterfall', '💦']
+					]
+				},
+				X: {
+					fruits: [],
+					vegetables: [],
+					animals: [['X-ray Fish', '🐠']],
+					vehicles: [],
+					food: [],
+					colors: [],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [],
+					jobs: [],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [['X-ray', '🩻']],
+					nature: []
+				},
+				Y: {
+					fruits: [['Yuzu', '💛']],
+					vegetables: [],
+					animals: [['Yak', '🐃']],
+					vehicles: [['Yacht', '🛥️']],
+					food: [['Yogurt', '🍶']],
+					colors: [['Yellow', '🟡']],
+					shapes: [],
+					directions: [],
+					family: [],
+					festivals: [],
+					jobs: [['Yoga Instructor', '🧘']],
+					business: [],
+					religion: [],
+					birds: [],
+					body: [],
+					nature: []
+				},
+				Z: {
+					fruits: [],
+					vegetables: [['Zucchini', '💚']],
+					animals: [['Zebra', '🦓']],
+					vehicles: [],
+					food: [['Ziti', '🔶']],
+					colors: [],
+					shapes: [],
+					directions: [['Zigzag', '⚡']],
+					family: [],
+					festivals: [],
+					jobs: [['Zookeeper', '🦁']],
+					business: [['Zoo', '🦁']],
+					religion: [['Zoroastrianism', '🔥']],
+					birds: [],
+					body: [],
+					nature: []
+				}
+			};
+
+			const CATS = [
+				{ key: 'fruits', label: 'Fruits', icon: '🍎', color: '#FFD3D3' },
+				{ key: 'vegetables', label: 'Vegetables', icon: '🥕', color: '#D6F5D6' },
+				{ key: 'animals', label: 'Animals', icon: '🐘', color: '#FFE3C2' },
+				{ key: 'birds', label: 'Birds', icon: '🐦', color: '#D2F3F1' },
+				{ key: 'vehicles', label: 'Vehicles', icon: '🚗', color: '#D6E8FF' },
+				{ key: 'food', label: 'Yummy Food', icon: '🍽️', color: '#FFE0EC' },
+				{ key: 'colors', label: 'Colors', icon: '🎨', color: '#EAD9FF' },
+				{ key: 'shapes', label: 'Shapes', icon: '🔺', color: '#D3F3F5' },
+				{ key: 'directions', label: 'Directions', icon: '🧭', color: '#E4E4EF' },
+				{ key: 'family', label: 'Family', icon: '👨‍👩‍👧', color: '#FFDCEA' },
+				{ key: 'festivals', label: 'Festivals', icon: '🎉', color: '#FFF1BF' },
+				{ key: 'jobs', label: 'Jobs & Professions', icon: '👩‍⚕️', color: '#D6E9FF' },
+				{ key: 'business', label: 'Shops & Places', icon: '🏬', color: '#EAD9C2' },
+				{ key: 'religion', label: 'Religions', icon: '🙏', color: '#E3DCFB' },
+				{ key: 'body', label: 'My Body', icon: '🦶', color: '#FFE2CF' },
+				{ key: 'nature', label: 'Nature & Weather', icon: '🌈', color: '#DBF5E3' }
+			];
+
+			const PALETTE = ['#FF6B6B', '#FFA652', '#FFD93D', '#6BCB77', '#4D96FF', '#5DA3FA', '#9D8DF1', '#C77DFF', '#FF8FB1', '#4ECDC4'];
+			const LETTERS = Object.keys(DATA);
+
+			/* ================= REALISTIC IMAGE RENDERER =================
+   Every picture is a Google Noto colour emoji (SVG), addressed by the
+   word's Unicode codepoints, so the SAME correct image loads every time —
+   no random photos, no wrong/duplicate results. Noto omits the fe0f
+   variation-selector in filenames, so we strip it. If a glyph is ever
+   missing, onerror swaps in the device's native emoji, so a card can
+   never show a broken image (works offline once cached). */
+			function emojiCP(str) {
+				const pts = [];
+				let i = 0;
+				while (i < str.length) {
+					const c = str.codePointAt(i);
+					pts.push(c.toString(16));
+					i += c > 0xffff ? 2 : 1;
+				}
+				return pts.filter(p => p !== 'fe0f').join('_');
+			}
+			function emojiSrc(e) {
+				return `https://cdn.jsdelivr.net/gh/googlefonts/noto-emoji/svg/emoji_u${emojiCP(e)}.svg`;
+			}
+			function emojiImg(e, cls) {
+				return `<img class="${cls || 'twe'}" src="${emojiSrc(e)}" alt="${e}" data-e="${e}" draggable="false" loading="lazy" onerror="this.outerHTML=this.dataset.e" />`;
+			}
+
+			/* Real photos for produce/dishes that have NO emoji (Wikimedia Commons —
+			   CORS-enabled, stable content-addressed URLs). Deterministic: the same
+			   correct picture loads every time. If a photo is ever unreachable it
+			   falls back to the emoji, so a card never breaks. */
+			const IMG = {
+				Apricot: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Apricot_and_cross_section.jpg/330px-Apricot_and_cross_section.jpg',
+				Date: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Dates005.jpg/330px-Dates005.jpg',
+				'Dragon Fruit': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Pitaya_cross_section_ed2.jpg/330px-Pitaya_cross_section_ed2.jpg',
+				Elderberry: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Sambucus-berries.jpg/330px-Sambucus-berries.jpg',
+				Fig: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Ficus_carica_L%2C_1771.jpg/330px-Ficus_carica_L%2C_1771.jpg',
+				Guava: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Guava_pink_fruit.jpg/330px-Guava_pink_fruit.jpg',
+				'Honeydew Melon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Honeydew.jpg/330px-Honeydew.jpg',
+				'Indian Gooseberry': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Phyllanthus_officinalis.jpg/330px-Phyllanthus_officinalis.jpg',
+				Jackfruit: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/The_jackfruit_is_holding_on_to_the_tree.jpg/330px-The_jackfruit_is_holding_on_to_the_tree.jpg',
+				Jamun: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Syzygium_cumini_Bra30.png/330px-Syzygium_cumini_Bra30.png',
+				Lychee: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Litchi_chinensis_fruits.JPG/330px-Litchi_chinensis_fruits.JPG',
+				Mangosteen: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Berthe_Hoola_van_Nooten48.jpg/330px-Berthe_Hoola_van_Nooten48.jpg',
+				Mulberry: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Morus_alba_FrJPG.jpg/330px-Morus_alba_FrJPG.jpg',
+				Papaya:
+					'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Carica_papaya_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-029.jpg/330px-Carica_papaya_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-029.jpg',
+				Plum: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Plums_African_Rose_-_whole%2C_halved_and_slice.jpg/330px-Plums_African_Rose_-_whole%2C_halved_and_slice.jpg',
+				Pomegranate: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Pomegranate_Juice_%282019%29.jpg/330px-Pomegranate_Juice_%282019%29.jpg',
+				Quince: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Pancrace_Bessa00.jpg/330px-Pancrace_Bessa00.jpg',
+				Raspberry: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Raspberry_-_halved_%28Rubus_idaeus%29.jpg/330px-Raspberry_-_halved_%28Rubus_idaeus%29.jpg',
+				Tangerine: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/TangerineFruit.jpg/330px-TangerineFruit.jpg',
+				'Ugli Fruit': 'https://upload.wikimedia.org/wikipedia/commons/0/07/Uniq_Fruit_from_Jamaica.jpg',
+				Yuzu: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Yuzu_oranges_%286459456959%29.jpg/330px-Yuzu_oranges_%286459456959%29.jpg'
+			};
+			/* Renders a real photo when one exists for the word, otherwise the emoji. */
+			function pictureHTML(item, cls) {
+				const url = IMG[item.word];
+				if (!url) return emojiImg(item.emoji, cls);
+				return `<img class="pic-img ${cls || ''}" src="${url}" alt="${item.word}" data-e="${item.emoji}" draggable="false" loading="lazy" onerror="this.outerHTML=this.dataset.e" />`;
+			}
+
+			/* ---- Validation helpers (used by Review mode) ----
+			   A word is FLAGGED when it has no real photo AND its icon is a generic
+			   colour/shape glyph, or an icon shared by several words. Colours, Shapes
+			   and Directions are skipped — there a coloured swatch / arrow IS correct. */
+			const SYMBOLIC = new Set(['colors', 'shapes', 'directions']);
+			const PLACEHOLDER_GLYPHS = new Set([...'🔴🟠🟡🟢🔵🟣🟤⚫⚪🟥🟧🟨🟩🟦🟪🟫🔶🔷🔸🔹🔺🔻⬛⬜◼◻◾◽▪▫❤🧡💛💚💙💜🖤🤍🤎💗💖💘💝', '🎋', '🍀']);
+			function isPlaceholder(emoji) {
+				return PLACEHOLDER_GLYPHS.has([...emoji][0]) || PLACEHOLDER_GLYPHS.has(emoji);
+			}
+			function reviewFlags(catKey) {
+				const items = [];
+				LETTERS.forEach(L => (DATA[L][catKey] || []).forEach(([w, e]) => items.push({ word: w, emoji: e, L })));
+				const counts = {};
+				items.forEach(it => {
+					if (!IMG[it.word]) counts[it.emoji] = (counts[it.emoji] || 0) + 1;
+				});
+				return items.map(it => {
+					const hasPhoto = !!IMG[it.word];
+					const placeholder = !hasPhoto && !SYMBOLIC.has(catKey) && isPlaceholder(it.emoji);
+					const duplicate = !hasPhoto && !SYMBOLIC.has(catKey) && counts[it.emoji] > 1;
+					return { ...it, hasPhoto, flag: placeholder || duplicate };
+				});
+			}
+
+			/* Meaningful "worlds" that group the 16 categories on the home screen. */
+			const GROUPS = [
+				{ label: 'Food & Yum', icon: '🍎', cats: ['fruits', 'vegetables', 'food'] },
+				{ label: 'Animal Kingdom', icon: '🐾', cats: ['animals', 'birds', 'body'] },
+				{ label: 'On the Move', icon: '🚗', cats: ['vehicles', 'directions'] },
+				{ label: 'People & Places', icon: '👪', cats: ['family', 'jobs', 'business', 'festivals', 'religion'] },
+				{ label: 'Colours & Shapes', icon: '🎨', cats: ['colors', 'shapes'] },
+				{ label: 'Our Big World', icon: '🌍', cats: ['nature'] }
+			];
+
+			let currentIndex = 0;
+
+			/* ================= RENDER HOME ================= */
+			const letterGrid = document.getElementById('letterGrid');
+			LETTERS.forEach((L, i) => {
+				const btn = document.createElement('button');
+				btn.className = 'letter-btn';
+				btn.textContent = L;
+				btn.style.background = PALETTE[i % PALETTE.length];
+				btn.style.setProperty('--r', ((i % 5) - 2) * 3 + 'deg');
+				const count = CATS.filter(c => (DATA[L][c.key] || []).length > 0).length;
+				const badge = document.createElement('span');
+				badge.className = 'cnt';
+				badge.textContent = count;
+				btn.appendChild(badge);
+				btn.addEventListener('click', () => openLetter(i));
+				letterGrid.appendChild(btn);
+			});
+
+			/* ================= LETTER SCREEN ================= */
+			const homeScreen = document.getElementById('home-screen');
+			const letterScreen = document.getElementById('letter-screen');
+			const topbar = document.getElementById('topbar');
+			const bigLetter = document.getElementById('bigLetter');
+			const letterCaption = document.getElementById('letterCaption');
+			const contentEl = document.getElementById('content');
+
+			function openLetter(i) {
+				currentIndex = i;
+				homeScreen.style.display = 'none';
+				alphabetScreen.style.display = 'none';
+				letterScreen.style.display = 'block';
+				renderLetter();
+				window.scrollTo(0, 0);
+			}
+
+			function renderLetter() {
+				const L = LETTERS[currentIndex];
+				const color = PALETTE[currentIndex % PALETTE.length];
+				topbar.style.background = `linear-gradient(135deg, ${color}, ${shade(color)})`;
+				bigLetter.textContent = L;
+				bigLetter.style.setProperty('--letter-color', color);
+				const activeCats = CATS.filter(c => (DATA[L][c.key] || []).length > 0);
+				letterCaption.textContent = activeCats.length + (activeCats.length === 1 ? ' category' : ' categories');
+
+				contentEl.innerHTML = '';
+				if (activeCats.length === 0) {
+					contentEl.innerHTML = '<p class="empty-msg">No words yet for this letter. Try another! 🙂</p>';
+					return;
+				}
+				activeCats.forEach(cat => {
+					const words = DATA[L][cat.key];
+					const tile = document.createElement('button');
+					tile.className = 'cat-tile';
+					tile.innerHTML = `
+      <span class="pill" style="background:${cat.color}">${emojiImg(cat.icon)}</span>
+      <span class="info">
+        <div class="label">${cat.label}</div>
+        <div class="sub">${words.length} word${words.length > 1 ? 's' : ''} · tap to view fullscreen</div>
+      </span>
+      <span class="preview">${pictureHTML({ word: words[0][0], emoji: words[0][1] })}</span>
+      <span class="chev">›</span>`;
+					tile.addEventListener('click', () => {
+						const idx = MASTER.findIndex(item => item.letter === L && item.catKey === cat.key);
+						openViewer(MASTER, idx);
+					});
+					contentEl.appendChild(tile);
+				});
+			}
+
+			/* ================= FULLSCREEN FLASHCARD VIEWER ================= */
+			/* One master sequence of every word, in letter order then category order.
+   Forward/backward traversal walks this single list continuously, so it
+   flows past the end of a category straight into the next category, and
+   past the end of a letter straight into the next letter (wrapping at
+   Z -> A and A -> Z). No separate "next category" logic is needed — every
+   word in the whole app lives at one flat index, and prev/next just moves
+   that index by 1. */
+			const MASTER = [];
+			LETTERS.forEach(L => {
+				CATS.forEach(cat => {
+					const words = DATA[L][cat.key] || [];
+					words.forEach(([word, emoji]) => {
+						MASTER.push({ letter: L, catKey: cat.key, catLabel: cat.label, catIcon: cat.icon, word, emoji });
+					});
+				});
+			});
+
+			function catAccent(key) {
+				const accents = {
+					fruits: '#FF7B7B',
+					vegetables: '#6BCB77',
+					animals: '#FFA652',
+					birds: '#4ECDC4',
+					vehicles: '#4D96FF',
+					food: '#FF8FB1',
+					colors: '#C77DFF',
+					shapes: '#3EC1D3',
+					directions: '#5A6B8C',
+					family: '#FF6FA5',
+					festivals: '#FFC93D',
+					jobs: '#5DA3FA',
+					business: '#B08968',
+					religion: '#9D8DF1',
+					body: '#FF9B6A',
+					nature: '#4ECB8C'
+				};
+				return accents[key] || '#4D96FF';
+			}
+
+			/* ================= ALPHABET SCREEN WIRING ================= */
+			const alphabetScreen = document.getElementById('alphabet-screen');
+			document.getElementById('openAlphabetBtn').addEventListener('click', () => {
+				homeScreen.style.display = 'none';
+				alphabetScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('alphaHomeBtn').addEventListener('click', () => {
+				alphabetScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+
+			/* ================= REVIEW / VALIDATE MODE ================= */
+			const reviewScreen = document.getElementById('review-screen');
+			function renderReview() {
+				let totalFlag = 0,
+					totalItems = 0;
+				const sections = CATS.map(cat => {
+					const flags = reviewFlags(cat.key);
+					const flagged = flags.filter(f => f.flag);
+					totalFlag += flagged.length;
+					totalItems += flags.length;
+					const badge = flagged.length ? `<span class="rv-badge warn">⚠️ ${flagged.length} to review</span>` : `<span class="rv-badge ok">✅ all clear</span>`;
+					const items = flagged.map(f => `<div class="rv-item flag"><span class="rv-pic">${pictureHTML(f)}<span class="rv-tag">⚠️</span></span><span>${f.word}</span></div>`).join('');
+					return `<div class="rv-cat"><div class="rv-cat-head">${emojiImg(cat.icon)} ${cat.label} ${badge}</div>${flagged.length ? `<div class="rv-items">${items}</div>` : ''}</div>`;
+				}).join('');
+				document.getElementById('reviewBody').innerHTML = `<div class="rv-summary">📋 ${totalItems} words checked · <strong>${totalFlag}</strong> may need a better picture.</div>` + sections;
+			}
+			document.getElementById('openReviewBtn').addEventListener('click', () => {
+				homeScreen.style.display = 'none';
+				reviewScreen.style.display = 'block';
+				renderReview();
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('reviewHomeBtn').addEventListener('click', () => {
+				reviewScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+
+			/* ================= RENDER HOME: GROUPED CATEGORY WORLDS ================= */
+			const catByKey = Object.fromEntries(CATS.map((c, i) => [c.key, { cat: c, index: i }]));
+			const groupSections = document.getElementById('groupSections');
+			GROUPS.forEach(group => {
+				const section = document.createElement('div');
+				section.className = 'group';
+				const tiles = group.cats
+					.map(key => {
+						const { cat, index } = catByKey[key];
+						const total = MASTER.filter(item => item.catKey === key).length;
+						return `<button class="cat-card" data-i="${index}">
+        <span class="ci" style="background:${cat.color}">${emojiImg(cat.icon)}</span>
+        <span class="cl">${cat.label}</span>
+        <span class="cn">${total} word${total === 1 ? '' : 's'}</span>
+      </button>`;
+					})
+					.join('');
+				section.innerHTML = `<div class="group-head"><span class="gh-emoji">${emojiImg(group.icon)}</span>${group.label}</div><div class="cat-grid">${tiles}</div>`;
+				groupSections.appendChild(section);
+			});
+			groupSections.querySelectorAll('.cat-card').forEach(btn => btn.addEventListener('click', () => openCategory(+btn.dataset.i)));
+
+			/* ================= CATEGORY DETAIL SCREEN ================= */
+			/* This is the mirror of the letter screen: pick a category first, then see
+   every word for that category across all 26 letters. Opening the fullscreen
+   viewer from here scopes forward/backward traversal to just this category's
+   words (still letter-ordered A→Z, still wraps both directions) — a separate
+   deck from the "every word in the app" traversal used from the letter path. */
+			const categoryScreen = document.getElementById('category-screen');
+			const catTopbar = document.getElementById('catTopbar');
+			const catBigIcon = document.getElementById('catBigIcon');
+			const catCaption = document.getElementById('catCaption');
+			const catContent = document.getElementById('catContent');
+
+			let catCursor = 0;
+
+			function openCategory(i) {
+				catCursor = i;
+				homeScreen.style.display = 'none';
+				categoryScreen.style.display = 'block';
+				renderCategory();
+				window.scrollTo(0, 0);
+			}
+
+			function renderCategory() {
+				const cat = CATS[catCursor];
+				const color = catAccent(cat.key);
+				catTopbar.style.background = `linear-gradient(135deg, ${color}, ${shade(color)})`;
+				catBigIcon.innerHTML = emojiImg(cat.icon);
+				catBigIcon.style.setProperty('--letter-color', color);
+				const deck = MASTER.filter(item => item.catKey === cat.key);
+				catCaption.textContent = cat.label + ' · ' + deck.length + (deck.length === 1 ? ' word' : ' words');
+
+				catContent.innerHTML = '';
+				if (deck.length === 0) {
+					catContent.innerHTML = '<p class="empty-msg">No words yet in this category. Try another! 🙂</p>';
+					return;
+				}
+				const grid = document.createElement('div');
+				grid.className = 'word-grid';
+				grid.innerHTML = deck
+					.map((item, idx) => {
+						const letterColor = PALETTE[LETTERS.indexOf(item.letter) % PALETTE.length];
+						return `<button class="word-card" data-i="${idx}">
+        <span class="wc-letter" style="background:${letterColor}">${item.letter}</span>
+        <span class="wc-img">${pictureHTML(item)}</span>
+        <span class="wc-word">${item.word}</span>
+      </button>`;
+					})
+					.join('');
+				grid.querySelectorAll('.word-card').forEach(btn => btn.addEventListener('click', () => openViewer(deck, +btn.dataset.i)));
+				catContent.appendChild(grid);
+			}
+
+			document.getElementById('catHomeBtn').addEventListener('click', () => {
+				categoryScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('catPrevBtn').addEventListener('click', () => {
+				catCursor = (catCursor - 1 + CATS.length) % CATS.length;
+				renderCategory();
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('catNextBtn').addEventListener('click', () => {
+				catCursor = (catCursor + 1) % CATS.length;
+				renderCategory();
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('catPlayBtn').addEventListener('click', () => {
+				const deck = MASTER.filter(item => item.catKey === CATS[catCursor].key);
+				if (deck.length) openViewer(deck, 0);
+			});
+
+			const viewer = document.getElementById('viewer');
+			const viewerStage = document.getElementById('viewerStage');
+			const viewerLabel = document.getElementById('viewerLabel');
+			const viewerCount = document.getElementById('viewerCount');
+			const progressFill = document.getElementById('progressFill');
+			const progressCaption = document.getElementById('progressCaption');
+
+			let currentDeck = MASTER;
+			let globalIndex = 0;
+
+			/* deck = array of {letter, catKey, catLabel, catIcon, word, emoji}
+   startIndex = where in that deck to begin. Forward/backward always wraps
+   within whatever deck is currently loaded — MASTER for "all words ever",
+   or a single-category slice for the by-category browsing mode. */
+			function openViewer(deck, startIndex) {
+				stopAuto();
+				currentDeck = deck;
+				viewer.classList.add('open');
+				showGlobal(startIndex >= 0 ? startIndex : 0);
+			}
+
+			function showGlobal(i) {
+				if (i < 0) i = currentDeck.length - 1;
+				if (i >= currentDeck.length) i = 0;
+				globalIndex = i;
+				const item = currentDeck[i];
+				const color = catAccent(item.catKey);
+				viewer.style.background = `linear-gradient(160deg, ${color}, ${shade(color)})`;
+				viewerLabel.innerHTML = `<span class="vletter">${item.letter}</span>${item.catIcon} ${item.catLabel}`;
+				viewerCount.textContent = i + 1 + ' / ' + currentDeck.length;
+				progressFill.style.width = ((i + 1) / currentDeck.length) * 100 + '%';
+				progressCaption.textContent = 'Word ' + (i + 1) + ' of ' + currentDeck.length + ' — swipe or tap to keep going';
+				renderFlashcard(item);
+				speak(item.word);
+			}
+
+			function renderFlashcard(item) {
+				viewerStage.querySelectorAll('.flashcard').forEach(el => el.remove());
+				const card = document.createElement('div');
+				card.className = 'flashcard active';
+				card.innerHTML = `
+    <div class="media"><div class="big-emoji">${pictureHTML(item)}</div></div>
+    <div class="big-word">${item.word}</div>`;
+				card.addEventListener('click', () => speak(item.word));
+				viewerStage.insertBefore(card, document.getElementById('sideLeft'));
+			}
+
+			document.getElementById('viewerClose').addEventListener('click', closeViewer);
+			function closeViewer() {
+				stopAuto();
+				viewer.classList.remove('open');
+				window.speechSynthesis && window.speechSynthesis.cancel();
+			}
+			document.getElementById('viewerHear').addEventListener('click', () => {
+				speak(currentDeck[globalIndex].word);
+			});
+			document.getElementById('arrowLeft').addEventListener('click', () => {
+				stopAuto();
+				showGlobal(globalIndex - 1);
+			});
+			document.getElementById('arrowRight').addEventListener('click', () => {
+				stopAuto();
+				showGlobal(globalIndex + 1);
+			});
+			document.getElementById('sideLeft').addEventListener('click', () => {
+				stopAuto();
+				showGlobal(globalIndex - 1);
+			});
+			document.getElementById('sideRight').addEventListener('click', () => {
+				stopAuto();
+				showGlobal(globalIndex + 1);
+			});
+
+			let vTouchStartX = 0;
+			viewerStage.addEventListener('touchstart', e => (vTouchStartX = e.changedTouches[0].screenX));
+			viewerStage.addEventListener('touchend', e => {
+				const dx = e.changedTouches[0].screenX - vTouchStartX;
+				if (Math.abs(dx) > 50) {
+					stopAuto();
+					if (dx < 0) showGlobal(globalIndex + 1);
+					else showGlobal(globalIndex - 1);
+				}
+			});
+
+			function shade(hex) {
+				// returns a slightly darker version of the hex color for gradient
+				let c = hex.substring(1);
+				let num = parseInt(c, 16);
+				let r = Math.max(0, (num >> 16) - 30),
+					g = Math.max(0, ((num >> 8) & 0xff) - 30),
+					b = Math.max(0, (num & 0xff) - 30);
+				return `rgb(${r},${g},${b})`;
+			}
+
+			function speak(text) {
+				if (!('speechSynthesis' in window)) return;
+				window.speechSynthesis.cancel();
+				const u = new SpeechSynthesisUtterance(text);
+				u.rate = 0.85;
+				u.pitch = 1.1;
+				window.speechSynthesis.speak(u);
+			}
+
+			document.getElementById('homeBtn').addEventListener('click', () => {
+				letterScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('prevBtn').addEventListener('click', () => {
+				currentIndex = (currentIndex - 1 + LETTERS.length) % LETTERS.length;
+				renderLetter();
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('nextBtn').addEventListener('click', () => {
+				currentIndex = (currentIndex + 1) % LETTERS.length;
+				renderLetter();
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('soundBtn').addEventListener('click', () => speak(LETTERS[currentIndex]));
+			bigLetter.addEventListener('click', () => speak(LETTERS[currentIndex]));
+
+			/* Swipe support */
+			let touchStartX = 0;
+			letterScreen.addEventListener('touchstart', e => (touchStartX = e.changedTouches[0].screenX));
+			letterScreen.addEventListener('touchend', e => {
+				const dx = e.changedTouches[0].screenX - touchStartX;
+				if (Math.abs(dx) > 60) {
+					if (dx < 0) document.getElementById('nextBtn').click();
+					else document.getElementById('prevBtn').click();
+				}
+			});
+
+			/* ================= AUTO-PLAY SLIDESHOW ================= */
+			let autoTimer = null;
+			const viewerPlay = document.getElementById('viewerPlay');
+
+			function stopAuto() {
+				if (autoTimer) {
+					clearInterval(autoTimer);
+					autoTimer = null;
+				}
+				viewerPlay.classList.remove('playing');
+				viewerPlay.textContent = '▶️';
+			}
+			function startAuto() {
+				stopAuto();
+				viewerPlay.classList.add('playing');
+				viewerPlay.textContent = '⏸️';
+				autoTimer = setInterval(() => {
+					showGlobal(globalIndex >= currentDeck.length - 1 ? 0 : globalIndex + 1);
+				}, 3200);
+			}
+			viewerPlay.addEventListener('click', () => (autoTimer ? stopAuto() : startAuto()));
+
+			/* Keyboard navigation for laptop/desktop */
+			document.addEventListener('keydown', e => {
+				if (!viewer.classList.contains('open')) return;
+				if (e.key === 'ArrowRight') {
+					stopAuto();
+					showGlobal(globalIndex + 1);
+				} else if (e.key === 'ArrowLeft') {
+					stopAuto();
+					showGlobal(globalIndex - 1);
+				} else if (e.key === 'Escape') {
+					closeViewer();
+				} else if (e.key === ' ') {
+					e.preventDefault();
+					autoTimer ? stopAuto() : startAuto();
+				}
+			});
+
+			/* Slideshow launcher (home) */
+			document.getElementById('startSlideshowBtn').addEventListener('click', () => {
+				openViewer(MASTER, 0);
+				startAuto();
+			});
+
+			/* ================= SEARCH (thesaurus across every word) ================= */
+			const searchInput = document.getElementById('searchInput');
+			const searchClear = document.getElementById('searchClear');
+			const searchResults = document.getElementById('searchResults');
+			const homeActions = document.getElementById('homeActions');
+			let searchDeck = [];
+
+			function escapeHtml(s) {
+				return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+			}
+
+			function runSearch() {
+				const q = searchInput.value.trim().toLowerCase();
+				searchClear.classList.toggle('show', q.length > 0);
+				if (!q) {
+					clearSearch();
+					return;
+				}
+				groupSections.style.display = 'none';
+				homeActions.style.display = 'none';
+				searchResults.classList.add('show');
+
+				searchDeck = MASTER.filter(it => it.word.toLowerCase().includes(q) || it.catLabel.toLowerCase().includes(q) || it.letter.toLowerCase() === q);
+				if (!searchDeck.length) {
+					searchResults.innerHTML = `<p class="empty-msg">No words found for “${escapeHtml(q)}” 🙁<br>Try apple, tiger, red…</p>`;
+					return;
+				}
+				searchResults.innerHTML =
+					`<div class="sr-count">${searchDeck.length} result${searchDeck.length > 1 ? 's' : ''} found</div>` +
+					searchDeck
+						.map((it, idx) => {
+							const letterColor = PALETTE[LETTERS.indexOf(it.letter) % PALETTE.length];
+							return `<button class="word-row" data-i="${idx}">
+        <span class="wr-letter" style="background:${letterColor}">${it.letter}</span>
+        <span class="wr-emoji">${pictureHTML(it)}</span>
+        <span class="wr-word">${escapeHtml(it.word)}</span>
+        <span class="chev">›</span></button>`;
+						})
+						.join('');
+				searchResults.querySelectorAll('.word-row').forEach(btn => btn.addEventListener('click', () => openViewer(searchDeck, +btn.dataset.i)));
+			}
+			function clearSearch() {
+				searchInput.value = '';
+				searchClear.classList.remove('show');
+				searchResults.classList.remove('show');
+				searchResults.innerHTML = '';
+				groupSections.style.display = '';
+				homeActions.style.display = '';
+			}
+			searchInput.addEventListener('input', runSearch);
+			searchClear.addEventListener('click', () => {
+				clearSearch();
+				searchInput.focus();
+			});
+
+			/* ================= QUIZ MODE ================= */
+			const quizScreen = document.getElementById('quiz-screen');
+			const quizPool = MASTER.slice();
+			let quizTarget = null,
+				quizScore = 0,
+				quizTotal = 0;
+
+			function shuffle(a) {
+				for (let i = a.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[a[i], a[j]] = [a[j], a[i]];
+				}
+				return a;
+			}
+
+			function startQuiz() {
+				homeScreen.style.display = 'none';
+				quizScreen.style.display = 'block';
+				quizScore = 0;
+				quizTotal = 0;
+				nextQuiz();
+				window.scrollTo(0, 0);
+			}
+			function nextQuiz() {
+				document.getElementById('quizFeedback').textContent = '';
+				document.getElementById('quizNextBtn').classList.remove('show');
+				const box = document.getElementById('quizOptions');
+				box.classList.remove('locked');
+
+				const target = quizPool[Math.floor(Math.random() * quizPool.length)];
+				quizTarget = target;
+				const opts = [target];
+				const used = new Set([target.word]);
+				let guard = 0;
+				while (opts.length < 4 && guard < 400) {
+					guard++;
+					const c = quizPool[Math.floor(Math.random() * quizPool.length)];
+					if (used.has(c.word) || c.emoji === target.emoji) continue;
+					used.add(c.word);
+					opts.push(c);
+				}
+				shuffle(opts);
+
+				document.getElementById('quizTargetWord').textContent = target.word;
+				document.getElementById('quizSub').textContent = `${target.catIcon} ${target.catLabel} · starts with ${target.letter}`;
+				box.innerHTML = '';
+				opts.forEach(o => {
+					const b = document.createElement('button');
+					b.className = 'quiz-opt';
+					b.innerHTML = pictureHTML(o);
+					b.dataset.correct = o.word === target.word ? '1' : '0';
+					b.addEventListener('click', () => answerQuiz(b, o));
+					box.appendChild(b);
+				});
+				updateQuizScore();
+				speak(target.word);
+			}
+			function answerQuiz(btn, opt) {
+				const box = document.getElementById('quizOptions');
+				if (box.classList.contains('locked')) return;
+				box.classList.add('locked');
+				quizTotal++;
+				const fb = document.getElementById('quizFeedback');
+				if (opt.word === quizTarget.word) {
+					btn.classList.add('correct');
+					quizScore++;
+					fb.textContent = '🎉 Yes! ' + quizTarget.word;
+					speak('Yes! ' + quizTarget.word);
+				} else {
+					btn.classList.add('wrong');
+					[...box.children].forEach(c => {
+						if (c.dataset.correct === '1') c.classList.add('correct');
+					});
+					fb.textContent = '💡 It was ' + quizTarget.word;
+					speak('It was ' + quizTarget.word);
+				}
+				updateQuizScore();
+				document.getElementById('quizNextBtn').classList.add('show');
+			}
+			function updateQuizScore() {
+				document.getElementById('quizScore').textContent = `⭐ Score: ${quizScore} / ${quizTotal}`;
+			}
+			document.getElementById('startQuizBtn').addEventListener('click', startQuiz);
+			document.getElementById('quizNextBtn').addEventListener('click', nextQuiz);
+			document.getElementById('quizHomeBtn').addEventListener('click', () => {
+				window.speechSynthesis && window.speechSynthesis.cancel();
+				quizScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('quizReplayBtn').addEventListener('click', () => quizTarget && speak(quizTarget.word));
+			document.getElementById('quizTargetHear').addEventListener('click', () => quizTarget && speak(quizTarget.word));
+		</script>
+	</body>
+</html>

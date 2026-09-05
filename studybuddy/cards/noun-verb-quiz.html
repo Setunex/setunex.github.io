@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Nouns and Verbs Quiz | Bright Steps</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			:root {
+				--ink: #26334d;
+				--teal: #167d7f;
+				--leaf: #328b63;
+				--coral: #de6256;
+				--sun: #f5bd36;
+				--paper: #fffdf7;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				min-height: 100vh;
+				font-family: 'Nunito', sans-serif;
+				color: var(--ink);
+				background: #edf8f3;
+				background-image: radial-gradient(circle at 11% 14%, #ffe59e 0 6%, transparent 6.2%), radial-gradient(circle at 90% 84%, #b8e5df 0 10%, transparent 10.2%);
+			}
+			.app {
+				width: min(100% - 28px, 650px);
+				margin: 0 auto;
+				padding: 20px 0 44px;
+			}
+			.topbar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 22px;
+			}
+			.home {
+				color: var(--teal);
+				font-weight: 800;
+				text-decoration: none;
+			}
+			.level {
+				padding: 6px 10px;
+				border-radius: 7px;
+				color: #72540b;
+				background: #fff2c9;
+				font-size: 0.78rem;
+				font-weight: 800;
+			}
+			header {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			h1,
+			h2 {
+				font-family: 'Baloo 2', cursive;
+				letter-spacing: 0;
+			}
+			h1 {
+				margin: 0;
+				font-size: clamp(2rem, 8vw, 2.65rem);
+				line-height: 1;
+			}
+			header p {
+				margin: 7px 0 0;
+				color: #60768a;
+				font-weight: 700;
+			}
+			.level-picker {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 7px;
+				margin: 0 0 18px;
+			}
+			.difficulty {
+				padding: 9px 6px;
+				border: 2px solid #d7e5df;
+				border-radius: 8px;
+				color: #526a7a;
+				background: #fffdf7;
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+			}
+			.difficulty.active {
+				border-color: var(--teal);
+				color: #fff;
+				background: var(--teal);
+			}
+			.progress {
+				margin-bottom: 14px;
+			}
+			.progress-label {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 6px;
+				color: #60768a;
+				font-size: 0.84rem;
+				font-weight: 800;
+			}
+			.track {
+				height: 13px;
+				overflow: hidden;
+				background: #d7e5df;
+				border-radius: 20px;
+			}
+			.fill {
+				width: 0;
+				height: 100%;
+				background: var(--teal);
+				border-radius: inherit;
+				transition: width 0.25s ease;
+			}
+			.card {
+				padding: 26px 22px 22px;
+				border: 2px solid #dce9e2;
+				border-radius: 8px;
+				background: var(--paper);
+				box-shadow: 0 7px 0 #cfe0d8;
+			}
+			.badge {
+				display: inline-block;
+				padding: 6px 11px;
+				color: #0e6062;
+				background: #d9f1ed;
+				border-radius: 7px;
+				font-size: 0.78rem;
+				font-weight: 800;
+			}
+			.question {
+				margin: 15px 0 21px;
+				font-family: 'Baloo 2', cursive;
+				font-size: clamp(1.35rem, 5vw, 1.75rem);
+				line-height: 1.28;
+			}
+			.word {
+				color: var(--teal);
+				text-decoration: underline;
+				text-decoration-thickness: 3px;
+				text-underline-offset: 4px;
+			}
+			.choices {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 12px;
+			}
+			button {
+				font: inherit;
+			}
+			.choice {
+				min-height: 96px;
+				border: 2px solid #dfe8e4;
+				border-radius: 8px;
+				color: var(--ink);
+				background: #fff;
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-size: 1.28rem;
+				font-weight: 700;
+				transition:
+					transform 0.15s ease,
+					border-color 0.15s ease;
+			}
+			.choice:hover {
+				transform: translateY(-2px);
+				border-color: var(--teal);
+			}
+			.choice:disabled {
+				cursor: default;
+			}
+			.choice.correct {
+				color: #185e43;
+				background: #e4f7ec;
+				border-color: var(--leaf);
+			}
+			.choice.wrong {
+				color: #953f39;
+				background: #ffedeb;
+				border-color: var(--coral);
+			}
+			.feedback {
+				display: none;
+				margin-top: 17px;
+				padding: 13px 14px;
+				border-radius: 7px;
+				font-weight: 800;
+				line-height: 1.4;
+			}
+			.feedback.show {
+				display: block;
+			}
+			.feedback.good {
+				color: #185e43;
+				background: #e4f7ec;
+			}
+			.feedback.bad {
+				color: #82463b;
+				background: #fff0de;
+			}
+			.next {
+				display: none;
+				width: 100%;
+				margin-top: 16px;
+				padding: 13px;
+				border: 0;
+				border-radius: 8px;
+				color: #fff;
+				background: var(--teal);
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-size: 1.1rem;
+				font-weight: 700;
+			}
+			.next.show {
+				display: block;
+			}
+			.next:active {
+				transform: scale(0.98);
+			}
+			.results {
+				display: none;
+				text-align: center;
+			}
+			.results.show {
+				display: block;
+			}
+			.results .star {
+				font-size: 3.2rem;
+			}
+			h2 {
+				margin: 3px 0;
+				font-size: 1.9rem;
+			}
+			.score {
+				margin: 12px 0;
+				color: var(--coral);
+				font-family: 'Baloo 2', cursive;
+				font-size: 2.6rem;
+				line-height: 1;
+			}
+			.results p {
+				color: #60768a;
+				font-weight: 700;
+			}
+			.restart {
+				padding: 12px 22px;
+				border: 0;
+				border-radius: 8px;
+				color: #463401;
+				background: var(--sun);
+				cursor: pointer;
+				font-family: 'Baloo 2', cursive;
+				font-size: 1.05rem;
+				font-weight: 700;
+			}
+			@media (max-width: 390px) {
+				.card {
+					padding: 22px 16px 17px;
+				}
+				.choices {
+					gap: 9px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="app">
+			<div class="topbar"><a class="home" href="index.html">&larr; Home</a><span class="level">Primary School</span></div>
+			<header>
+				<h1>Nouns &amp; Verbs</h1>
+				<p>Can you spot naming words and action words?</p>
+			</header>
+			<div class="level-picker" aria-label="Choose quiz difficulty">
+				<button class="difficulty active" type="button" data-level="basic">Basic</button>
+				<button class="difficulty" type="button" data-level="medium">Medium</button>
+				<button class="difficulty" type="button" data-level="challenge">Challenge</button>
+			</div>
+			<div class="progress" aria-label="Quiz progress">
+				<div class="progress-label"><span id="count">Question 1</span><span id="score-label">Score: 0</span></div>
+				<div class="track"><div class="fill" id="fill"></div></div>
+			</div>
+			<section class="card">
+				<div id="quiz">
+					<span class="badge" id="badge">Find the word type</span>
+					<div class="question" id="question"></div>
+					<div class="choices" id="choices"></div>
+					<div class="feedback" id="feedback" aria-live="polite"></div>
+					<button class="next" id="next" type="button">Next question &rarr;</button>
+				</div>
+				<div class="results" id="results">
+					<div class="star" aria-hidden="true">&#11088;</div>
+					<h2 id="result-title">Great work!</h2>
+					<div class="score" id="result-score"></div>
+					<p id="result-message"></p>
+					<button class="restart" id="restart" type="button">Play again</button>
+				</div>
+			</section>
+		</main>
+		<script>
+			const wordBanks = {
+				animals: [
+					'ant',
+					'bear',
+					'bird',
+					'cat',
+					'cow',
+					'crab',
+					'deer',
+					'dog',
+					'dolphin',
+					'elephant',
+					'fish',
+					'fox',
+					'frog',
+					'giraffe',
+					'goat',
+					'horse',
+					'kangaroo',
+					'lion',
+					'monkey',
+					'mouse',
+					'owl',
+					'panda',
+					'penguin',
+					'rabbit',
+					'shark',
+					'tiger',
+					'turtle',
+					'whale',
+					'zebra'
+				],
+				objects: [
+					'ball',
+					'book',
+					'bottle',
+					'brush',
+					'chair',
+					'clock',
+					'crayon',
+					'cup',
+					'drum',
+					'eraser',
+					'fork',
+					'glasses',
+					'kite',
+					'lamp',
+					'notebook',
+					'pencil',
+					'pillow',
+					'plate',
+					'ruler',
+					'scissors',
+					'shoe',
+					'spoon',
+					'table',
+					'toy',
+					'umbrella',
+					'watch'
+				],
+				people: ['artist', 'baby', 'baker', 'brother', 'chef', 'child', 'doctor', 'farmer', 'friend', 'grandmother', 'nurse', 'pilot', 'sister', 'teacher', 'uncle', 'writer'],
+				places: ['beach', 'classroom', 'farm', 'garden', 'home', 'library', 'market', 'museum', 'park', 'playground', 'school', 'shop', 'station', 'zoo'],
+				actions: [
+					'bake',
+					'bounce',
+					'clap',
+					'climb',
+					'crawl',
+					'dance',
+					'draw',
+					'drink',
+					'eat',
+					'fly',
+					'hop',
+					'jump',
+					'laugh',
+					'listen',
+					'paint',
+					'read',
+					'run',
+					'sing',
+					'skip',
+					'sleep',
+					'smile',
+					'swim',
+					'talk',
+					'throw',
+					'walk',
+					'wave',
+					'write'
+				]
+			};
+			const sentenceStarts = [
+				'After school,',
+				'At the park,',
+				'Every morning,',
+				'On Saturday,',
+				'In the garden,',
+				'Before lunch,',
+				'During the game,',
+				'At the beach,',
+				'When it rains,',
+				'In music class,'
+			];
+			const nounSentences = ['The {word} is nearby.', 'I can see a {word}.', 'We found the {word} today.', 'My friend likes the {word}.', 'The {word} is important.', 'Please look at the {word}.'];
+			const verbSentences = ['we like to {word}.', 'the children {word} together.', 'I will {word} carefully.', 'they can {word} after school.', 'we all {word} with joy.', 'you may {word} now.'];
+			let difficulty = 'basic';
+			let current = 0;
+			let score = 0;
+			let activeQuestion;
+			const count = document.getElementById('count');
+			const scoreLabel = document.getElementById('score-label');
+			const fill = document.getElementById('fill');
+			const badge = document.getElementById('badge');
+			const question = document.getElementById('question');
+			const choices = document.getElementById('choices');
+			const feedback = document.getElementById('feedback');
+			const next = document.getElementById('next');
+			const quiz = document.getElementById('quiz');
+			const results = document.getElementById('results');
+
+			function shuffle(items) {
+				for (let index = items.length - 1; index > 0; index -= 1) {
+					const randomIndex = Math.floor(Math.random() * (index + 1));
+					[items[index], items[randomIndex]] = [items[randomIndex], items[index]];
+				}
+				return items;
+			}
+
+			function randomItem(items) {
+				return items[Math.floor(Math.random() * items.length)];
+			}
+
+			function getWord(type) {
+				if (type === 'Verb') return { word: randomItem(wordBanks.actions), category: 'action' };
+				const categories = Object.keys(wordBanks).filter(category => category !== 'actions');
+				const category = randomItem(categories);
+				return { word: randomItem(wordBanks[category]), category };
+			}
+
+			function createClassificationQuestion(withSentence = false) {
+				const type = Math.random() < 0.5 ? 'Noun' : 'Verb';
+				const item = getWord(type);
+				const capitalized = `${item.word[0].toUpperCase()}${item.word.slice(1)}`;
+				let text = `Is <span class="word">${item.word}</span> a noun or a verb?`;
+				if (withSentence) {
+					const template = type === 'Noun' ? randomItem(nounSentences) : randomItem(verbSentences);
+					const matchingStart = sentenceStarts.find(start => start.toLowerCase().includes(item.word));
+					const start = randomItem(sentenceStarts.filter(candidate => candidate !== matchingStart));
+					text = `Which type of word is <span class="word">${item.word}</span> in this sentence?<br><br>${start} ${template.replace('{word}', `<span class="word">${item.word}</span>`)}`;
+				}
+				const clue =
+					type === 'Noun'
+						? `${capitalized} is a naming word. The correct answer is Noun, because nouns name people, places, animals, or things.`
+						: `${capitalized} is an action word. The correct answer is Verb, because verbs tell us what someone or something does.`;
+				return { answer: type, options: ['Noun', 'Verb'], text, clue };
+			}
+
+			function createWordChoiceQuestion() {
+				const type = Math.random() < 0.5 ? 'Noun' : 'Verb';
+				const correct = getWord(type).word;
+				const oppositeType = type === 'Noun' ? 'Verb' : 'Noun';
+				const options = [correct];
+				while (options.length < 4) {
+					const distractor = getWord(oppositeType).word;
+					if (!options.includes(distractor)) options.push(distractor);
+				}
+				return {
+					answer: correct,
+					options: shuffle(options),
+					text: `Which word is a <span class="word">${type.toLowerCase()}</span>?`,
+					clue: `The correct answer is ${correct}. It is a ${type.toLowerCase()}${type === 'Noun' ? ' because it names a person, place, animal, or thing.' : ' because it tells us about an action.'}`
+				};
+			}
+
+			function createSentenceAnalysisQuestion() {
+				const askForNouns = Math.random() < 0.5;
+				if (askForNouns) {
+					const first = getWord('Noun').word;
+					let second = getWord('Noun').word;
+					while (second === first) second = getWord('Noun').word;
+					const verb = randomItem(['run', 'play', 'sleep', 'jump', 'swim']);
+					return {
+						answer: '2',
+						options: ['1', '2', '3', '4'],
+						text: `How many nouns are in this sentence?<br><br>The <span class="word">${first}</span> and the <span class="word">${second}</span> ${verb}.`,
+						clue: `The correct answer is 2. ${first[0].toUpperCase()}${first.slice(1)} and ${second} are nouns because they are naming words.`
+					};
+				}
+				const noun = getWord('Noun').word;
+				const firstVerb = randomItem(['run', 'play', 'jump', 'smile', 'dance']);
+				let secondVerb = randomItem(['read', 'sing', 'swim', 'clap', 'laugh']);
+				while (secondVerb === firstVerb) secondVerb = randomItem(wordBanks.actions);
+				return {
+					answer: '2',
+					options: ['1', '2', '3', '4'],
+					text: `How many verbs are in this sentence?<br><br>The ${noun} can <span class="word">${firstVerb}</span> and <span class="word">${secondVerb}</span>.`,
+					clue: `The correct answer is 2. ${firstVerb[0].toUpperCase()}${firstVerb.slice(1)} and ${secondVerb} are verbs because they show actions.`
+				};
+			}
+
+			function createQuestion() {
+				if (difficulty === 'basic') return createClassificationQuestion();
+				if (difficulty === 'medium') return Math.random() < 0.5 ? createClassificationQuestion(true) : createWordChoiceQuestion();
+				return randomItem([createClassificationQuestion, createWordChoiceQuestion, createSentenceAnalysisQuestion])(true);
+			}
+
+			function resetQuiz() {
+				current = 0;
+				score = 0;
+				quiz.style.display = 'block';
+				results.className = 'results';
+				renderQuestion();
+			}
+
+			function renderQuestion() {
+				activeQuestion = createQuestion();
+				count.textContent = `Question ${current + 1}`;
+				scoreLabel.textContent = `Score: ${score}`;
+				fill.style.width = '100%';
+				badge.textContent = `${difficulty[0].toUpperCase()}${difficulty.slice(1)} practice`;
+				question.innerHTML = activeQuestion.text;
+				choices.innerHTML = '';
+				activeQuestion.options.forEach(option => {
+					const button = document.createElement('button');
+					button.className = 'choice';
+					button.type = 'button';
+					button.textContent = option;
+					button.addEventListener('click', () => answer(option, button));
+					choices.appendChild(button);
+				});
+				feedback.className = 'feedback';
+				next.className = 'next';
+			}
+
+			function answer(selected, button) {
+				const item = activeQuestion;
+				const correct = selected === item.answer;
+				choices.querySelectorAll('button').forEach(choice => {
+					choice.disabled = true;
+					if (choice.textContent === item.answer) choice.classList.add('correct');
+				});
+				if (correct) score += 1;
+				else button.classList.add('wrong');
+				scoreLabel.textContent = `Score: ${score}`;
+				feedback.textContent = correct ? `Correct! ${item.clue}` : `Not quite. ${item.clue}`;
+				feedback.className = `feedback show ${correct ? 'good' : 'bad'}`;
+				next.textContent = 'Next question ->';
+				next.className = 'next show';
+			}
+
+			next.addEventListener('click', () => {
+				current += 1;
+				renderQuestion();
+			});
+			document.getElementById('restart').addEventListener('click', () => {
+				resetQuiz();
+			});
+			document.querySelectorAll('.difficulty').forEach(button => {
+				button.addEventListener('click', () => {
+					difficulty = button.dataset.level;
+					document.querySelectorAll('.difficulty').forEach(control => control.classList.toggle('active', control === button));
+					resetQuiz();
+				});
+			});
+			renderQuestion();
+		</script>
+	</body>
+</html>

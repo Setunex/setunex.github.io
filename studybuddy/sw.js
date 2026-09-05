@@ -1,9 +1,10 @@
-const STATIC_CACHE = 'studybuddy-static-v3';
+const STATIC_CACHE = 'studybuddy-static-v4';
 const RUNTIME_CACHE = 'dynquiz-runtime-v1';
 const OFFLINE_URL = './offline.html';
 
 const FILES = [
 	'./index.html',
+	'./quiz.html',
 	'./styles.css',
 	'./app.js',
 	'./generator.js',

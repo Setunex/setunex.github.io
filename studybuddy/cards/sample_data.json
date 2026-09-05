@@ -1,0 +1,4 @@
+{
+	"subjects": ["math", "physics"],
+	"notes": "This file can be replaced by a larger dataset or by extracting samples from scribd-downloader-main. The generator currently contains templates for math and physics. Add more templates in generator.js or load JSON of structured questions."
+}

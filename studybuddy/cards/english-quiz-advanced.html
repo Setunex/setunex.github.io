@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Letter & Word Adventure — Advanced Class 2 Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #EAF7F0;
+    --card: #FFFFFF;
+    --sun: #FFC93C;
+    --coral: #FF6B6B;
+    --sky: #4EA8DE;
+    --leaf: #4CAF7D;
+    --ink: #2B2D42;
+    --ink-soft: #6B7089;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito', sans-serif;
+    background:
+      radial-gradient(circle at 8% 12%, #FFF3D0 0%, transparent 40%),
+      radial-gradient(circle at 92% 85%, #DCF3FF 0%, transparent 45%),
+      var(--bg);
+    min-height:100vh;
+    color:var(--ink);
+    padding:20px 14px 60px;
+  }
+  .wrap{max-width:640px; margin:0 auto;}
+
+  header{text-align:center; margin-bottom:14px;}
+  .title-eyebrow{
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    color:var(--sky);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-size:.75rem;
+  }
+  h1{
+    font-family:'Fredoka', sans-serif;
+    font-size:1.8rem;
+    margin:4px 0 6px;
+    color:var(--ink);
+  }
+  .subtitle{color:var(--ink-soft); font-size:.92rem; margin:0;}
+
+  /* progress bar */
+  .progress-wrap{ margin:18px 0 6px; }
+  .progress-track{
+    background:#E4E4EE;
+    border-radius:999px;
+    height:14px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--sun), var(--coral));
+    width:0%;
+    border-radius:999px;
+    transition: width .35s ease;
+  }
+  .progress-label{
+    display:flex;
+    justify-content:space-between;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    margin-top:6px;
+    font-weight:700;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:22px;
+    padding:26px 22px 22px;
+    box-shadow:0 10px 30px rgba(43,45,66,0.08);
+    border:1px solid #F0F0F5;
+  }
+
+  .section-tag{
+    display:inline-block;
+    font-family:'Fredoka', sans-serif;
+    font-size:.72rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+  .section-tag.articles{ background:#FFF0D6; color:#B8791C; }
+  .section-tag.sounds{ background:#DDF1FF; color:#1E6FA8; }
+
+  .q-count{ color:var(--ink-soft); font-size:.85rem; margin-bottom:6px; }
+
+  .question{
+    font-family:'Fredoka', sans-serif;
+    font-size:1.2rem;
+    line-height:1.5;
+    margin:6px 0 20px;
+  }
+  .question .blank{
+    display:inline-block;
+    min-width:46px;
+    border-bottom:3px dashed var(--coral);
+    text-align:center;
+  }
+  .question .word{ color:var(--sky); }
+
+  .options{ display:grid; gap:12px; }
+  .opt{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:1.02rem;
+    text-align:left;
+    padding:13px 16px;
+    border-radius:14px;
+    border:2px solid #E7E7F0;
+    background:#FBFBFD;
+    color:var(--ink);
+    cursor:pointer;
+    transition: all .15s ease;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .opt:hover{ border-color:var(--sky); background:#F3FAFF; }
+  .opt.correct{ background:#E7F8EE; border-color:var(--leaf); color:#276B49; }
+  .opt.wrong{ background:#FFEDED; border-color:var(--coral); color:#A83A3A; }
+  .opt:disabled{ cursor:default; }
+  .opt .badge{
+    width:26px; height:26px; border-radius:50%;
+    background:#fff; border:2px solid #DADAE6;
+    display:flex; align-items:center; justify-content:center;
+    font-size:.85rem; flex-shrink:0;
+  }
+
+  .feedback{
+    margin-top:16px;
+    padding:14px 16px;
+    border-radius:14px;
+    font-size:.92rem;
+    line-height:1.5;
+    display:none;
+  }
+  .feedback.show{ display:block; }
+  .feedback.good{ background:#E7F8EE; color:#276B49; }
+  .feedback.bad{ background:#FFF3E8; color:#8A5A22; }
+
+  .next-btn{
+    margin-top:18px;
+    width:100%;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    font-size:1.03rem;
+    padding:14px;
+    border-radius:14px;
+    border:none;
+    background:var(--sky);
+    color:#fff;
+    cursor:pointer;
+    display:none;
+  }
+  .next-btn.show{ display:block; }
+  .next-btn:active{ transform:scale(0.98); }
+
+  /* results screen */
+  .results{ text-align:center; display:none; }
+  .results.show{ display:block; }
+  .results .mascot{ font-size:3.2rem; margin-bottom:6px; }
+  .results h2{ font-family:'Fredoka', sans-serif; font-size:1.5rem; margin:0 0 6px; }
+  .score-big{
+    font-family:'Fredoka', sans-serif;
+    font-size:2.6rem;
+    color:var(--coral);
+    margin:10px 0;
+  }
+  .breakdown{
+    display:flex;
+    justify-content:center;
+    gap:18px;
+    margin:14px 0;
+    flex-wrap:wrap;
+  }
+  .breakdown div{
+    background:#F7F7FB;
+    border-radius:14px;
+    padding:10px 16px;
+    font-size:.85rem;
+    color:var(--ink-soft);
+  }
+  .breakdown strong{ display:block; font-family:'Fredoka', sans-serif; font-size:1.1rem; color:var(--ink); }
+  .results p{ color:var(--ink-soft); }
+  .restart-btn{
+    margin-top:14px;
+    font-family:'Fredoka', sans-serif;
+    font-weight:600;
+    padding:12px 26px;
+    border-radius:14px;
+    border:none;
+    background:var(--sun);
+    color:#5A3E00;
+    cursor:pointer;
+    font-size:1rem;
+  }
+
+  .quiz-body{ display:block; }
+  .quiz-body.hide{ display:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="title-eyebrow">Class 2 · English Practice · Advanced</div>
+    <h1>🔤 Letter & Word Adventure+</h1>
+    <p class="subtitle">56 questions on articles (a / an / the) and letter sounds — blends, silent letters, rhymes and more!</p>
+  </header>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label">
+      <span id="progressText">Question 1 of 56</span>
+      <span id="progressPct">0%</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="quiz-body" id="quizBody">
+      <span class="section-tag" id="sectionTag">Articles</span>
+      <div class="q-count" id="qCount"></div>
+      <div class="question" id="questionText"></div>
+      <div class="options" id="optionsBox"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn">Next question →</button>
+    </div>
+
+    <div class="results" id="results">
+      <div class="mascot" id="mascot">🌟</div>
+      <h2 id="resultTitle">Great job!</h2>
+      <div class="score-big" id="scoreBig">0 / 56</div>
+      <div class="breakdown" id="breakdown"></div>
+      <p id="resultMsg"></p>
+      <button class="restart-btn" id="restartBtn">Try again</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  // ============ ARTICLES (15) ============
+  { section:"Articles", text:'I have <span class="blank">___</span> apple.', options:["a","an","the"], answer:1,
+    explain:'"Apple" starts with a vowel sound, so we use "an". We say "an apple".' },
+  { section:"Articles", text:'She has <span class="blank">___</span> cat.', options:["a","an","the"], answer:0,
+    explain:'"Cat" starts with a consonant sound, so we use "a". We say "a cat".' },
+  { section:"Articles", text:'<span class="blank">___</span> sun is very bright today.', options:["A","An","The"], answer:2,
+    explain:'There is only one sun, and everyone knows which one we mean — so we use "the".' },
+  { section:"Articles", text:'He wants <span class="blank">___</span> orange.', options:["a","an","the"], answer:1,
+    explain:'"Orange" starts with a vowel sound, so we use "an".' },
+  { section:"Articles", text:'Can I have <span class="blank">___</span> pencil, please?', options:["a","an","the"], answer:0,
+    explain:'"Pencil" starts with a consonant sound, so we use "a".' },
+  { section:"Articles", text:'My father works for <span class="blank">___</span> hour every day.', options:["a","an","the"], answer:1,
+    explain:'The "h" in "hour" is silent, so the word sounds like it starts with "our" — a vowel sound. We say "an hour".' },
+  { section:"Articles", text:'She is <span class="blank">___</span> honest girl.', options:["a","an","the"], answer:1,
+    explain:'The "h" in "honest" is silent, so it sounds like "onest" — a vowel sound. We say "an honest girl".' },
+  { section:"Articles", text:'He wants to be <span class="blank">___</span> university student.', options:["a","an","the"], answer:0,
+    explain:'"University" is spelled with a "u", but it sounds like "yoo-niversity" — that is a consonant sound. So we use "a".' },
+  { section:"Articles", text:'Look! I saw <span class="blank">___</span> UFO in the sky!', options:["a","an","the"], answer:0,
+    explain:'"UFO" is said as "yoo-eff-oh" — the first sound is a consonant sound "y", so we use "a".' },
+  { section:"Articles", text:'<span class="blank">___</span> moon is very far from Earth.', options:["A","An","The"], answer:2,
+    explain:'There is only one moon that we can see from Earth, so we use "the" for things that are one-of-a-kind.' },
+  { section:"Articles", text:'I read <span class="blank">___</span> interesting book yesterday.', options:["a","an","the"], answer:1,
+    explain:'"Interesting" starts with a vowel sound, so we use "an".' },
+  { section:"Articles", text:'They live in <span class="blank">___</span> oldest house in the village.', options:["a","an","the"], answer:2,
+    explain:'We use "the" before superlatives like "oldest", "biggest", and "best" because they point to one special thing.' },
+  { section:"Articles", text:'Please pass me <span class="blank">___</span> salt.', options:["a","an","the"], answer:2,
+    explain:'We use "the" when both people know exactly which thing we mean — like the salt already on the table.' },
+  { section:"Articles", text:'She wants to be <span class="blank">___</span> doctor when she grows up.', options:["a","an","the"], answer:0,
+    explain:'"Doctor" starts with a consonant sound, so we use "a".' },
+  { section:"Articles", text:'I saw two dogs in the park. <span class="blank">___</span> dogs were playing happily.', options:["A","An","The"], answer:2,
+    explain:'Once we already mentioned "two dogs", we use "the" to talk about those same dogs again.' },
+
+  // ============ SOUNDS: Beginning sounds (8) ============
+  { section:"Sounds", text:'Which word starts with the <b>same sound</b> as "<span class="word">Cat</span>"?', options:["Ball","Car","Fish"], answer:1,
+    explain:'"Cat" and "Car" both start with the /k/ sound.' },
+  { section:"Sounds", text:'Which letter makes the sound at the start of "<span class="word">Sun</span>"?', options:["S","F","M"], answer:0,
+    explain:'"Sun" starts with the /s/ sound, made by the letter S.' },
+  { section:"Sounds", text:'Which word starts with a <b>vowel sound</b>?', options:["Umbrella","Table","Dog"], answer:0,
+    explain:'"Umbrella" starts with the vowel sound "u". Vowel sounds are a, e, i, o, u.' },
+  { section:"Sounds", text:'Which word starts with the <b>same sound</b> as "<span class="word">Zebra</span>"?', options:["Zoo","Sun","Van"], answer:0,
+    explain:'"Zebra" and "Zoo" both start with the /z/ sound.' },
+  { section:"Sounds", text:'Which word starts with the <b>same sound</b> as "<span class="word">Queen</span>"?', options:["Quilt","Kite","Wind"], answer:0,
+    explain:'"Queen" and "Quilt" both start with the /kw/ sound made by "qu".' },
+  { section:"Sounds", text:'Which word does <b>NOT</b> start with the /b/ sound?', options:["Van","Ball","Bear"], answer:0,
+    explain:'"Van" starts with the /v/ sound, not /b/. "Ball" and "Bear" both start with /b/.' },
+  { section:"Sounds", text:'Which word starts with the <b>same sound</b> as "<span class="word">Yellow</span>"?', options:["Yo-yo","Lion","Jelly"], answer:0,
+    explain:'"Yellow" and "Yo-yo" both start with the /y/ sound.' },
+  { section:"Sounds", text:'Which word starts with the <b>same sound</b> as "<span class="word">Giraffe</span>"?', options:["Jacket","Goat","Girl"], answer:0,
+    explain:'"Giraffe" starts with a soft "g" that sounds like /j/, just like "Jacket".' },
+
+  // ============ SOUNDS: Ending sounds (6) ============
+  { section:"Sounds", text:'Which word ends with the <b>same sound</b> as "<span class="word">Cup</span>"?', options:["Map","Bag","Sun"], answer:0,
+    explain:'"Cup" and "Map" both end with the /p/ sound.' },
+  { section:"Sounds", text:'Which word ends with the <b>same sound</b> as "<span class="word">Dog</span>"?', options:["Big","Cat","Sun"], answer:0,
+    explain:'"Dog" and "Big" both end with the /g/ sound.' },
+  { section:"Sounds", text:'Which word ends with the <b>/t/</b> sound?', options:["Cat","Dog","Sun"], answer:0,
+    explain:'"Cat" ends with the /t/ sound.' },
+  { section:"Sounds", text:'Which word ends with the <b>same sound</b> as "<span class="word">Bell</span>"?', options:["Ball","Bed","Big"], answer:0,
+    explain:'"Bell" and "Ball" both end with the /l/ sound.' },
+  { section:"Sounds", text:'Which word ends with the <b>/n/</b> sound?', options:["Sun","Sad","Sit"], answer:0,
+    explain:'"Sun" ends with the /n/ sound.' },
+  { section:"Sounds", text:'Which word ends with the <b>same sound</b> as "<span class="word">Fish</span>"?', options:["Wish","Fit","Fin"], answer:0,
+    explain:'"Fish" and "Wish" both end with the /sh/ sound.' },
+
+  // ============ SOUNDS: Rhyming words (6) ============
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Hat</span>"?', options:["Hop","Cat","Sun"], answer:1,
+    explain:'"Hat" and "Cat" both end with the "-at" sound, so they rhyme.' },
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Cake</span>"?', options:["Lake","Cat","Cup"], answer:0,
+    explain:'"Cake" and "Lake" both end with the "-ake" sound.' },
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Star</span>"?', options:["Car","Sit","Stop"], answer:0,
+    explain:'"Star" and "Car" both end with the "-ar" sound.' },
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Night</span>"?', options:["Light","Not","New"], answer:0,
+    explain:'"Night" and "Light" both end with the "-ight" sound.' },
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Frog</span>"?', options:["Log","Fish","Frame"], answer:0,
+    explain:'"Frog" and "Log" both end with the "-og" sound.' },
+  { section:"Sounds", text:'Which word <b>rhymes</b> with "<span class="word">Snake</span>"?', options:["Cake","Sock","Sun"], answer:0,
+    explain:'"Snake" and "Cake" both end with the "-ake" sound.' },
+
+  // ============ SOUNDS: Blends (6) ============
+  { section:"Sounds", text:'Which word starts with the blend "<b>bl</b>"?', options:["Blue","Ball","Bear"], answer:0,
+    explain:'"Blue" starts with the "bl" blend — two consonant sounds said together.' },
+  { section:"Sounds", text:'Which word starts with the blend "<b>st</b>"?', options:["Star","Sun","Toy"], answer:0,
+    explain:'"Star" starts with the "st" blend.' },
+  { section:"Sounds", text:'Which word starts with the blend "<b>tr</b>"?', options:["Tree","Toy","Ten"], answer:0,
+    explain:'"Tree" starts with the "tr" blend.' },
+  { section:"Sounds", text:'Which word starts with the blend "<b>cl</b>"?', options:["Clock","Cat","Coat"], answer:0,
+    explain:'"Clock" starts with the "cl" blend.' },
+  { section:"Sounds", text:'Which word starts with the blend "<b>gr</b>"?', options:["Grape","Goat","Girl"], answer:0,
+    explain:'"Grape" starts with the "gr" blend.' },
+  { section:"Sounds", text:'Which word starts with the blend "<b>sw</b>"?', options:["Swim","Sun","Sock"], answer:0,
+    explain:'"Swim" starts with the "sw" blend.' },
+
+  // ============ SOUNDS: Digraphs (5) ============
+  { section:"Sounds", text:'Which word starts with "<b>sh</b>"?', options:["Ship","Sun","Sit"], answer:0,
+    explain:'"Ship" starts with the "sh" digraph, which makes one new sound /sh/.' },
+  { section:"Sounds", text:'Which word starts with "<b>ch</b>"?', options:["Chair","Cat","Coat"], answer:0,
+    explain:'"Chair" starts with the "ch" digraph, making the /ch/ sound.' },
+  { section:"Sounds", text:'Which word starts with "<b>th</b>"?', options:["Thumb","Table","Ten"], answer:0,
+    explain:'"Thumb" starts with the "th" digraph.' },
+  { section:"Sounds", text:'Which word starts with "<b>wh</b>"?', options:["Whale","Wind","Water"], answer:0,
+    explain:'"Whale" starts with the "wh" digraph.' },
+  { section:"Sounds", text:'Which word ends with "<b>ng</b>"?', options:["Ring","Run","Red"], answer:0,
+    explain:'"Ring" ends with the "ng" digraph, making the /ng/ sound.' },
+
+  // ============ SOUNDS: Silent letters (5) ============
+  { section:"Sounds", text:'Which letter is <b>silent</b> in "<span class="word">Knife</span>"?', options:["K","N","F"], answer:0,
+    explain:'In "knife", the "k" is silent — we only hear /naif/.' },
+  { section:"Sounds", text:'Which letter is <b>silent</b> in "<span class="word">Comb</span>"?', options:["C","O","B"], answer:2,
+    explain:'In "comb", the "b" is silent — we only hear /kohm/.' },
+  { section:"Sounds", text:'Which letter is <b>silent</b> in "<span class="word">Write</span>"?', options:["W","R","T"], answer:0,
+    explain:'In "write", the "w" is silent — we only hear /rait/.' },
+  { section:"Sounds", text:'Which letter is <b>silent</b> in "<span class="word">Lamb</span>"?', options:["L","A","B"], answer:2,
+    explain:'In "lamb", the "b" is silent — we only hear /lam/.' },
+  { section:"Sounds", text:'Which letter is <b>silent</b> in "<span class="word">Hour</span>"?', options:["H","O","R"], answer:0,
+    explain:'In "hour", the "h" is silent — we only hear /aur/.' },
+
+  // ============ SOUNDS: Long vs short vowels (5) ============
+  { section:"Sounds", text:'Does "<span class="word">Cake</span>" have a <b>long</b> or <b>short</b> "a" sound?', options:["Long a","Short a"], answer:0,
+    explain:'"Cake" says the letter name "A" — that is a long vowel sound.' },
+  { section:"Sounds", text:'Does "<span class="word">Cat</span>" have a <b>long</b> or <b>short</b> "a" sound?', options:["Long a","Short a"], answer:1,
+    explain:'"Cat" makes a quick /a/ sound, like in "apple" — that is a short vowel sound.' },
+  { section:"Sounds", text:'Does "<span class="word">Bike</span>" have a <b>long</b> or <b>short</b> "i" sound?', options:["Long i","Short i"], answer:0,
+    explain:'"Bike" says the letter name "I" — that is a long vowel sound.' },
+  { section:"Sounds", text:'Does "<span class="word">Pig</span>" have a <b>long</b> or <b>short</b> "i" sound?', options:["Long i","Short i"], answer:1,
+    explain:'"Pig" makes a quick /i/ sound — that is a short vowel sound.' },
+  { section:"Sounds", text:'Does "<span class="word">Home</span>" have a <b>long</b> or <b>short</b> "o" sound?', options:["Long o","Short o"], answer:0,
+    explain:'"Home" says the letter name "O" — that is a long vowel sound.' }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+let sectionScore = { Articles: {correct:0,total:0}, Sounds: {correct:0,total:0} };
+
+questions.forEach(q => sectionScore[q.section].total++);
+
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const progressPct = document.getElementById('progressPct');
+const sectionTag = document.getElementById('sectionTag');
+const qCount = document.getElementById('qCount');
+const questionText = document.getElementById('questionText');
+const optionsBox = document.getElementById('optionsBox');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const quizBody = document.getElementById('quizBody');
+const resultsEl = document.getElementById('results');
+const scoreBig = document.getElementById('scoreBig');
+const resultTitle = document.getElementById('resultTitle');
+const resultMsg = document.getElementById('resultMsg');
+const mascot = document.getElementById('mascot');
+const breakdown = document.getElementById('breakdown');
+const restartBtn = document.getElementById('restartBtn');
+
+const total = questions.length;
+
+function letterFor(i){ return String.fromCharCode(65 + i); }
+
+function updateProgress(){
+  const pct = Math.round((current / total) * 100);
+  progressFill.style.width = pct + '%';
+  progressText.textContent = `Question ${current + 1} of ${total}`;
+  progressPct.textContent = pct + '%';
+}
+
+function loadQuestion(){
+  answered = false;
+  const q = questions[current];
+  sectionTag.textContent = q.section === 'Articles' ? 'Articles (a / an / the)' : 'Letter Sounds';
+  sectionTag.className = 'section-tag ' + (q.section === 'Articles' ? 'articles' : 'sounds');
+  qCount.textContent = '';
+  questionText.innerHTML = q.text;
+  optionsBox.innerHTML = '';
+  feedback.className = 'feedback';
+  feedback.textContent = '';
+  nextBtn.classList.remove('show');
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="badge">${letterFor(i)}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i, btn));
+    optionsBox.appendChild(btn);
+  });
+
+  updateProgress();
+}
+
+function selectAnswer(i, btn){
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const allBtns = optionsBox.querySelectorAll('.opt');
+  allBtns.forEach(b => b.disabled = true);
+
+  if (i === q.answer){
+    btn.classList.add('correct');
+    score++;
+    sectionScore[q.section].correct++;
+    feedback.className = 'feedback show good';
+    feedback.textContent = '✅ Correct! ' + q.explain;
+  } else {
+    btn.classList.add('wrong');
+    allBtns[q.answer].classList.add('correct');
+    feedback.className = 'feedback show bad';
+    feedback.textContent = '💡 Not quite. ' + q.explain;
+  }
+
+  nextBtn.classList.add('show');
+  nextBtn.textContent = current === total - 1 ? 'See my results →' : 'Next question →';
+}
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if (current < total){
+    loadQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults(){
+  quizBody.classList.add('hide');
+  resultsEl.classList.add('show');
+  progressFill.style.width = '100%';
+  progressText.textContent = `Question ${total} of ${total}`;
+  progressPct.textContent = '100%';
+  scoreBig.textContent = `${score} / ${total}`;
+
+  breakdown.innerHTML = `
+    <div><strong>${sectionScore.Articles.correct}/${sectionScore.Articles.total}</strong>Articles</div>
+    <div><strong>${sectionScore.Sounds.correct}/${sectionScore.Sounds.total}</strong>Sounds</div>
+  `;
+
+  let title, msg, face;
+  const pct = score / total;
+  if (pct === 1){
+    title = 'Perfect score!'; face = '🏆';
+    msg = "Amazing! You know 'a, an, the' and letter sounds really well!";
+  } else if (pct >= 0.75){
+    title = 'Great job!'; face = '🌟';
+    msg = "You're doing very well. A little more practice and you'll get them all!";
+  } else if (pct >= 0.5){
+    title = 'Good try!'; face = '🙂';
+    msg = "Nice effort! Read the tips again and try the quiz once more.";
+  } else {
+    title = "Keep practicing!"; face = '💪';
+    msg = "Learning takes time. Try the quiz again — you'll improve fast!";
+  }
+  resultTitle.textContent = title;
+  resultMsg.textContent = msg;
+  mascot.textContent = face;
+}
+
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  sectionScore = { Articles: {correct:0,total:0}, Sounds: {correct:0,total:0} };
+  questions.forEach(q => sectionScore[q.section].total++);
+  resultsEl.classList.remove('show');
+  quizBody.classList.remove('hide');
+  loadQuestion();
+});
+
+loadQuestion();
+</script>
+</body>
+</html>
