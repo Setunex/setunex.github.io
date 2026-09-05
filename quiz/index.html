@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Dynamic Olympiad Quiz — Setunex</title>
+		<link rel="stylesheet" href="../assets/style.css" />
+		<link rel="stylesheet" href="./styles.css" />
+		<link rel="manifest" href="./manifest.json" />
+	</head>
+	<body>
+		<header class="umbrella">
+			<div class="bar">
+				<a class="org" href="../index.html">◇ Setunex</a>
+				<div class="crumb">/ Dynamic Olympiad Quiz</div>
+			</div>
+		</header>
+
+		<header class="site">
+			<div class="bar">
+				<a class="brand" href="../index.html">◇ Setunex</a>
+				<nav>
+					<a href="../index.html#products">Products</a>
+					<a href="../index.html#principles">Principles</a>
+					<a href="../index.html#contact">Contact</a>
+				</nav>
+			</div>
+		</header>
+
+		<main class="card" style="max-width: 920px; margin: 28px auto; padding: 20px">
+			<h1>Dynamic Olympiad Quiz</h1>
+			<p class="lede">A small offline-first quiz generator for math and physics practice. Questions are generated algorithmically so they vary each time.</p>
+
+			<div class="controls">
+				<label
+					>Subject:
+					<select id="subjectSelect"></select
+				></label>
+				<label
+					>Difficulty:
+					<select id="difficultySelect">
+						<option value="easy">Easy</option>
+						<option value="medium" selected>Medium</option>
+						<option value="hard">Hard</option>
+					</select></label
+				>
+				<button id="newBtn">New Question</button>
+			</div>
+			
+			<div style="display:flex;gap:10px;align-items:center;margin:12px 0">
+				<button id="checkUpdatesBtn" class="tag optional">Check for updates</button>
+				<div id="updateNotice" style="color:var(--accent);display:none">Update available — <button id="reloadBtn">Reload</button></div>
+			</div>
+
+			<section id="questionArea" class="card hidden">
+				<div id="questionText" class="question"></div>
+				<div id="choices" class="choices"></div>
+				<div class="meta">Pattern: <span id="patternLabel">—</span></div>
+				<div class="actions">
+					<button id="showAnswerBtn">Show Answer</button>
+					<button id="nextBtn">Next</button>
+				</div>
+				<div id="answerArea" class="answer hidden"></div>
+			</section>
+
+			<footer class="callout">Installable PWA — try adding to your home screen on Android.</footer>
+		</main>
+
+		<script src="./generator.js"></script>
+		<script src="./app.js"></script>
+		<script>
+			console.log('ServiceWorker supported?', 'serviceWorker' in navigator);
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker
+					.register('./sw.js')
+					.then(reg => console.log('ServiceWorker registered', reg))
+					.catch(err => console.error('ServiceWorker registration failed:', err));
+			}
+		</script>
+	</body>
+</html>

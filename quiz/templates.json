@@ -1,0 +1,29 @@
+[
+  {
+    "id": "samp1",
+    "pattern": "two-term-sum",
+    "subject": "math",
+    "difficulty": "easy",
+    "text": "Let a=12 and b=8. Compute a + b.",
+    "choices": ["20","19","18","22"],
+    "answer": "20"
+  },
+  {
+    "id": "samp2",
+    "pattern": "linear-solve",
+    "subject": "math",
+    "difficulty": "medium",
+    "text": "Solve for x: 3x + 2 = 11.",
+    "choices": ["3","2","-3","1"],
+    "answer": "3"
+  },
+  {
+    "id": "samp3",
+    "pattern": "kinematic-1d",
+    "subject": "physics",
+    "difficulty": "medium",
+    "text": "An object accelerates at 5 m/s^2 from rest for 4 s. What is its final velocity (m/s)?",
+    "choices": ["20","10","15","25"],
+    "answer": "20"
+  }
+]
