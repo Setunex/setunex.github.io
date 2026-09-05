@@ -26,21 +26,33 @@
 	}
 
 	// Remote question bank (templates.json) stored in localStorage under 'remote_questions'
-	function loadRemoteQuestions(){
-		try{ return JSON.parse(localStorage.getItem('remote_questions')||'[]'); }catch(e){return []}
+	function loadRemoteQuestions() {
+		try {
+			return JSON.parse(localStorage.getItem('remote_questions') || '[]');
+		} catch (e) {
+			return [];
+		}
 	}
-	function saveRemoteQuestions(arr){ localStorage.setItem('remote_questions', JSON.stringify(arr||[])); }
+	function saveRemoteQuestions(arr) {
+		localStorage.setItem('remote_questions', JSON.stringify(arr || []));
+	}
 
-	async function fetchAndCacheTemplates(){
-		try{
+	async function fetchAndCacheTemplates() {
+		try {
 			const resp = await fetch('./templates.json');
-			if(!resp.ok) throw new Error('templates fetch failed');
+			if (!resp.ok) throw new Error('templates fetch failed');
 			const data = await resp.json();
 			// cache in SW runtime cache for offline use
-			try{ const c = await caches.open('dynquiz-runtime-v1'); await c.put('./templates.json', new Response(JSON.stringify(data))); }catch(e){}
+			try {
+				const c = await caches.open('dynquiz-runtime-v1');
+				await c.put('./templates.json', new Response(JSON.stringify(data)));
+			} catch (e) {}
 			saveRemoteQuestions(data);
 			return data;
-		}catch(err){ console.warn('fetchAndCacheTemplates failed', err); return null; }
+		} catch (err) {
+			console.warn('fetchAndCacheTemplates failed', err);
+			return null;
+		}
 	}
 
 	function showQuestion(q) {
@@ -71,7 +83,7 @@
 		const remote = loadRemoteQuestions();
 		let q;
 		if (remote && remote.length && Math.random() < 0.4) {
-			q = remote[Math.floor(Math.random()*remote.length)];
+			q = remote[Math.floor(Math.random() * remote.length)];
 		} else {
 			q = QuizGenerator.generateQuestion(subj, diff);
 		}
@@ -95,7 +107,7 @@
 
 		// load cached remote questions if available
 		const rem = loadRemoteQuestions();
-		if(rem && rem.length) console.log('Loaded remote question bank', rem.length);
+		if (rem && rem.length) console.log('Loaded remote question bank', rem.length);
 
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.getRegistration().then(reg => {
@@ -114,13 +126,15 @@
 	});
 
 	// Check updates button
-	if(checkUpdatesBtn){
-		checkUpdatesBtn.addEventListener('click', async ()=>{
+	if (checkUpdatesBtn) {
+		checkUpdatesBtn.addEventListener('click', async () => {
 			checkUpdatesBtn.textContent = 'Checking...';
 			await fetchAndCacheTemplates();
 			checkUpdatesBtn.textContent = 'Check for updates';
 			alert('Templates refreshed (if remote available)');
 		});
 	}
-	if(reloadBtn){ reloadBtn.addEventListener('click', ()=>window.location.reload()); }
+	if (reloadBtn) {
+		reloadBtn.addEventListener('click', () => window.location.reload());
+	}
 })();

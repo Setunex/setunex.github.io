@@ -1,6 +1,6 @@
 {
-	"name": "Dynamic Olympiad Quiz",
-	"short_name": "DynQuiz",
+	"name": "StudyBuddy — Practice & Learning",
+	"short_name": "StudyBuddy",
 	"start_url": "./index.html",
 	"display": "standalone",
 	"background_color": "#f6f7fb",

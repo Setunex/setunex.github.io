@@ -1,8 +1,30 @@
-const STATIC_CACHE = 'dynquiz-static-v2';
+const STATIC_CACHE = 'studybuddy-static-v3';
 const RUNTIME_CACHE = 'dynquiz-runtime-v1';
 const OFFLINE_URL = './offline.html';
 
-const FILES = ['./index.html', './styles.css', './app.js', './generator.js', './manifest.json', OFFLINE_URL, './icon.svg'];
+const FILES = [
+	'./index.html',
+	'./styles.css',
+	'./app.js',
+	'./generator.js',
+	'./manifest.json',
+	OFFLINE_URL,
+	'./icon.svg',
+	// Learning pages under cards/
+	'./cards/index.html',
+	'./cards/styles.css',
+	'./cards/app.js',
+	'./cards/generator.js',
+	'./cards/manifest.json',
+	'./cards/offline.html',
+	'./cards/icon.svg',
+	'./cards/abc-adventure-fullscreen.html',
+	'./cards/english-quiz-advanced.html',
+	'./cards/quiz.html',
+	'./cards/subject-quiz.html',
+	'./cards/noun-verb-quiz.html',
+	'./cards/review.html'
+];
 
 self.addEventListener('install', e => {
 	e.waitUntil(caches.open(STATIC_CACHE).then(cache => cache.addAll(FILES)));
