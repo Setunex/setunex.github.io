@@ -1,8 +1,9 @@
-const STATIC_CACHE = 'studybuddy-static-v4';
-const RUNTIME_CACHE = 'dynquiz-runtime-v1';
+const STATIC_CACHE = 'studybuddy-static-v6';
+const RUNTIME_CACHE = 'studybuddy-runtime-v2';
 const OFFLINE_URL = './offline.html';
 
 const FILES = [
+	'./',
 	'./index.html',
 	'./quiz.html',
 	'./styles.css',
@@ -11,24 +12,27 @@ const FILES = [
 	'./manifest.json',
 	OFFLINE_URL,
 	'./icon.svg',
-	// Learning pages under cards/
-	'./cards/index.html',
-	'./cards/styles.css',
-	'./cards/app.js',
-	'./cards/generator.js',
-	'./cards/manifest.json',
-	'./cards/offline.html',
-	'./cards/icon.svg',
-	'./cards/abc-adventure-fullscreen.html',
-	'./cards/english-quiz-advanced.html',
-	'./cards/quiz.html',
-	'./cards/subject-quiz.html',
-	'./cards/noun-verb-quiz.html',
-	'./cards/review.html'
+	// Bright Steps (flattened from ex-cards/ subfolder)
+	'./bright-steps.html',
+	'./bright-steps.css',
+	'./bright-steps.js',
+	'./bright-steps-generator.js',
+	'./cards-quiz.html',
+	'./abc-adventure-fullscreen.html',
+	'./english-quiz-advanced.html',
+	'./noun-verb-quiz.html',
+	'./subject-quiz.html',
+	'./review.html',
+	'./sample_data.json'
 ];
 
 self.addEventListener('install', e => {
-	e.waitUntil(caches.open(STATIC_CACHE).then(cache => cache.addAll(FILES)));
+	e.waitUntil(
+		caches.open(STATIC_CACHE).then(cache =>
+			// cache.add on each URL individually so one 404 does not abort install
+			Promise.all(FILES.map(u => cache.add(u).catch(err => console.warn('SW precache skip', u, err))))
+		)
+	);
 	self.skipWaiting();
 });
 
@@ -48,7 +52,7 @@ self.addEventListener('fetch', event => {
 
 	// Network-first for templates.json (content updates)
 	if (url.pathname.endsWith('/templates.json') || request.url.endsWith('/templates.json')) {
-		e.respondWith(
+		event.respondWith(
 			fetch(request)
 				.then(response => {
 					const copy = response.clone();
