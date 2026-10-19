@@ -1140,7 +1140,7 @@
 				margin: 0 4px 18px;
 			}
 			.home-action {
-				flex: 1;
+				flex: 1 1 30%;
 				border: none;
 				border-radius: 20px;
 				padding: 15px 10px;
@@ -1167,6 +1167,160 @@
 				background: linear-gradient(135deg, #4d96ff, #5da3fa);
 			}
 
+			/* ---------- WORD MIX ---------- */
+			.home-action.mix {
+				background: linear-gradient(135deg, #ff8fb1, #ff6b6b);
+			}
+			.home-opts {
+				margin: -6px 6px 12px;
+				color: var(--ink);
+			}
+			.mx-switch {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				font-weight: 800;
+				font-size: 0.85rem;
+				cursor: pointer;
+			}
+			.mx-strip {
+				position: relative;
+				display: flex;
+				gap: 8px;
+				overflow-x: auto;
+				padding: 4px 2px 12px;
+				scrollbar-width: none;
+			}
+			.mx-letter {
+				flex: 0 0 auto;
+				width: 38px;
+				height: 38px;
+				border: none;
+				border-radius: 50%;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 800;
+				background: #fff;
+				color: var(--ink);
+				cursor: pointer;
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+			}
+			.mx-letter.on {
+				background: var(--letter-color);
+				color: #fff;
+			}
+			.mx-actions {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 12px;
+			}
+			.mx-actions button {
+				flex: 1;
+				border: none;
+				border-radius: 20px;
+				padding: 14px 10px;
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				font-size: 1.05rem;
+				color: #fff;
+				cursor: pointer;
+				box-shadow: 0 4px 0 rgba(0, 0, 0, 0.12);
+			}
+			.mx-actions button:active {
+				transform: translateY(2px);
+			}
+			.mx-actions .shuffle {
+				background: linear-gradient(135deg, #ff8fb1, #ff6b6b);
+			}
+			.mx-actions .play {
+				background: linear-gradient(135deg, #4d96ff, #5da3fa);
+			}
+			.mx-panel {
+				background: #fff;
+				border-radius: 20px;
+				padding: 8px 14px 12px;
+				margin-bottom: 12px;
+				color: var(--ink);
+				box-shadow: 0 3px 0 rgba(0, 0, 0, 0.06);
+			}
+			.mx-panel summary {
+				font-family: 'Baloo 2', cursive;
+				font-weight: 700;
+				cursor: pointer;
+				padding: 4px 0;
+			}
+			.mx-row {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 8px 14px;
+				margin-top: 10px;
+			}
+			.mx-label {
+				font-weight: 800;
+				font-size: 0.78rem;
+				color: #8a80b8;
+				min-width: 52px;
+			}
+			.mx-seg {
+				display: flex;
+				gap: 4px;
+				background: #f1eefb;
+				border-radius: 14px;
+				padding: 3px;
+			}
+			.mx-seg button,
+			.mx-chip,
+			.mx-go {
+				border: none;
+				background: transparent;
+				border-radius: 11px;
+				padding: 6px 11px;
+				font-family: 'Nunito', sans-serif;
+				font-weight: 800;
+				font-size: 0.8rem;
+				color: var(--ink);
+				cursor: pointer;
+			}
+			.mx-seg button.on,
+			.mx-chip.on {
+				background: #7b6ef0;
+				color: #fff;
+			}
+			.mx-chips {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+			}
+			.mx-chip {
+				background: #f1eefb;
+			}
+			.mx-chip img.twe {
+				width: 1.1em;
+				height: 1.1em;
+				vertical-align: -0.2em;
+			}
+			.mx-seed {
+				width: 110px;
+				border: 2px solid #e4def7;
+				border-radius: 12px;
+				padding: 5px 10px;
+				font: inherit;
+				font-weight: 800;
+				color: var(--ink);
+			}
+			.mx-go {
+				background: #7b6ef0;
+				color: #fff;
+			}
+			.mx-hint {
+				font-size: 0.72rem;
+				font-weight: 700;
+				color: #9a90c2;
+			}
+			.word-card .wc-word b {
+				font-size: 1.15em;
+			}
+
 			@media (prefers-reduced-motion: reduce) {
 				.letter-btn,
 				.cat-tile,
@@ -1191,9 +1345,13 @@
 					<button class="s-clear" id="searchClear" aria-label="Clear search">✕</button>
 				</div>
 				<div id="searchResults"></div>
+				<div class="home-opts">
+					<label class="mx-switch"><input type="checkbox" class="photos-toggle" checked /> 📷 Real photos</label>
+				</div>
 				<div class="home-actions" id="homeActions">
 					<button class="home-action quiz" id="startQuizBtn">🎯 Quiz</button>
 					<button class="home-action slideshow" id="startSlideshowBtn">🎬 Slideshow</button>
+					<button class="home-action mix" id="openMixBtn">🎲 Word Mix</button>
 					<button class="home-action alphabet" id="openAlphabetBtn">🔤 A–Z</button>
 					<button class="home-action review" id="openReviewBtn">🔎 Review</button>
 				</div>
@@ -1232,6 +1390,23 @@
 					</div>
 				</div>
 				<div class="content" id="catContent"></div>
+			</div>
+
+			<!-- WORD MIX SCREEN (one letter, randomized words) -->
+			<div id="mix-screen" style="display: none">
+				<div class="topbar" id="mixTopbar">
+					<div class="topbar-row">
+						<button class="icon-btn" id="mixHomeBtn" aria-label="Home">🏠</button>
+						<button class="icon-btn" id="mixPrevBtn" aria-label="Previous letter">◀</button>
+						<div class="big-letter-wrap">
+							<div class="big-letter" id="mixBigLetter">A</div>
+							<div class="letter-caption">🎲 Word Mix</div>
+						</div>
+						<button class="icon-btn" id="mixNextBtn" aria-label="Next letter">▶</button>
+						<button class="icon-btn" id="mixSoundBtn" aria-label="Hear letter">🔊</button>
+					</div>
+				</div>
+				<div class="content" id="mixContent"></div>
 			</div>
 
 			<!-- LETTER SCREEN -->
@@ -1311,6 +1486,7 @@
 			</div>
 		</div>
 
+		<script src="abc_photos.js"></script>
 		<script>
 			/* ================= DATA ================= */
 			const DATA = {
@@ -1321,7 +1497,7 @@
 						['Avocado', '🥑']
 					],
 					vegetables: [
-						['Artichoke', '�'],
+						['Artichoke', '🌿'],
 						['Asparagus', '🌿']
 					],
 					animals: [
@@ -2301,6 +2477,215 @@
 				}
 			};
 
+			/* Extra common words, merged into DATA. Format: 'Word emoji, Word emoji' (emoji after the last space). */
+			const EXTRA = {
+				A: {
+					things: 'Axe 🪓, Anchor ⚓, Alarm Clock ⏰',
+					animals: 'Anaconda 🐍',
+					jobs: 'Astronaut 🧑‍🚀',
+					business: 'Airport ✈️'
+				},
+				B: {
+					fruits: 'Blackberry 🫐',
+					vegetables: 'Beetroot 🟣, Bitter Gourd 🥒',
+					animals: 'Buffalo 🐃, Beaver 🦫, Bison 🦬',
+					vehicles: 'Bulldozer 🚜',
+					food: 'Burger 🍔, Biryani 🍛',
+					things: 'Ball ⚽, Balloon 🎈, Bag 👜, Bed 🛏️, Book 📖, Bottle 🍼, Bowl 🥣, Broom 🧹, Bucket 🪣, Bell 🔔, Battery 🔋, Basket 🧺',
+					clothes: 'Boots 🥾, Blouse 👚, Bikini 👙',
+					colors: 'Beige 🟫',
+					body: 'Brain 🧠, Beard 🧔, Bone 🦴',
+					family: 'Boy 👦',
+					business: 'Bridge 🌉'
+				},
+				C: {
+					fruits: 'Cranberry 🍒',
+					vegetables: 'Celery 🥬, Chilli 🌶️, Coriander 🌿',
+					animals: 'Cheetah 🐆, Chimpanzee 🐒, Chameleon 🦎, Crocodile 🐊, Caterpillar 🐛',
+					birds: 'Cuckoo 🐦',
+					vehicles: 'Cable Car 🚠, Crane 🏗️',
+					food: 'Chocolate 🍫, Candy 🍬, Coffee ☕, Cashew 🥜, Cupcake 🧁',
+					things: 'Chair 🪑, Clock 🕐, Comb 🪮, Crayon 🖍️, Cup ☕, Candle 🕯️, Camera 📷, Computer 💻, Crown 👑, Coin 🪙, Calendar 📅',
+					clothes: 'Cap 🧢, Coat 🧥',
+					colors: 'Coral 🟠',
+					shapes: 'Crescent 🌙',
+					jobs: 'Cook 🧑‍🍳',
+					business: 'Cinema 🎬, Church ⛪',
+					family: 'Child 🧒',
+					nature: 'Cactus 🌵, Cave 🏔️'
+				},
+				D: {
+					animals: 'Donkey 🫏, Dinosaur 🦕',
+					food: 'Dumpling 🥟',
+					things: 'Door 🚪, Drum 🥁, Dice 🎲, Doll 🪆, Dustbin 🗑️, Diary 📔',
+					clothes: 'Dress 👗',
+					jobs: 'Dancer 💃',
+					nature: 'Dew 💧, Daisy 🌼'
+				},
+				E: {
+					birds: 'Emu 🐦',
+					food: 'Egg 🥚',
+					things: 'Envelope ✉️, Earphones 🎧'
+				},
+				F: {
+					animals: 'Fly 🪰',
+					food: 'Fried Rice 🍚',
+					things: 'Flag 🚩, Fork 🍴, Frame 🖼️, Fan 🪭',
+					jobs: 'Fisherman 🎣',
+					family: 'Friend 🧑‍🤝‍🧑',
+					body: 'Face 🙂, Fist ✊',
+					nature: 'Fire 🔥'
+				},
+				G: {
+					fruits: 'Grapefruit 🍊',
+					animals: 'Gecko 🦎, Grasshopper 🦗',
+					food: 'Gulab Jamun 🍮',
+					things: 'Gift 🎁, Glasses 👓, Globe 🌐, Guitar 🎸',
+					clothes: 'Gloves 🧤',
+					family: 'Girl 👧',
+					nature: 'Galaxy 🌌'
+				},
+				H: {
+					animals: 'Hamster 🐹, Hen 🐔',
+					birds: 'Hummingbird 🐦',
+					vehicles: 'Hot Air Balloon 🎈',
+					food: 'Hot Dog 🌭',
+					things: 'Hammer 🔨, Headphones 🎧, Helmet ⛑️, Hourglass ⏳, House 🏠, Hook 🪝',
+					clothes: 'Hat 👒',
+					business: 'Hospital 🏥, Hotel 🏨',
+					body: 'Hair 💇'
+				},
+				I: {
+					animals: 'Insect 🐛',
+					things: 'Ink 🖋️',
+					nature: 'Island 🏝️'
+				},
+				J: {
+					things: 'Jar 🫙, Jigsaw 🧩, Joystick 🕹️',
+					clothes: 'Jacket 🧥, Jeans 👖'
+				},
+				K: {
+					animals: 'Kitten 🐱',
+					birds: 'Kingfisher 🐦',
+					food: 'Kebab 🍢',
+					things: 'Key 🔑, Kite 🪁, Knife 🔪, Keyboard ⌨️',
+					clothes: 'Kimono 👘'
+				},
+				L: {
+					animals: 'Lobster 🦞, Lizard 🦎',
+					food: 'Laddu 🟠, Lassi 🥛, Lollipop 🍭, Lemonade 🍋',
+					things: 'Light Bulb 💡, Ladder 🪜, Lock 🔒, Lantern 🏮, Laptop 💻',
+					colors: 'Lilac 🟣',
+					business: 'Library 📚',
+					body: 'Lungs 🫁',
+					nature: 'Lightning ⚡, Lotus 🪷'
+				},
+				M: {
+					fruits: 'Melon 🍈, Mandarin 🍊',
+					vegetables: 'Mint 🌿',
+					animals: 'Mosquito 🦟',
+					vehicles: 'Metro 🚇',
+					things: 'Mirror 🪞, Magnet 🧲, Microphone 🎤, Map 🗺️, Medal 🏅, Mobile Phone 📱',
+					colors: 'Mint 🟢',
+					jobs: 'Magician 🧙',
+					business: 'Museum 🏛️',
+					family: 'Man 👨'
+				},
+				N: {
+					birds: 'Nightingale 🐦',
+					food: 'Nuts 🥜',
+					things: 'Needle 🪡, Notebook 📓, Newspaper 📰, Necklace 📿',
+					nature: 'Night 🌙'
+				},
+				O: {
+					animals: 'Otter 🦦',
+					food: 'Omelette 🍳',
+					things: 'Oil Lamp 🪔',
+					shapes: 'Octagon 🛑',
+					business: 'Office 🏢'
+				},
+				P: {
+					vegetables: 'Parsley 🌿',
+					animals: 'Puppy 🐶, Panther 🐆, Polar Bear 🐻‍❄️, Pony 🐴',
+					birds: 'Pigeon 🐦, Pelican 🐦',
+					vehicles: 'Police Car 🚓',
+					food: 'Peanut 🥜, Paratha 🫓, Pudding 🍮',
+					things: 'Pen 🖊️, Pencil ✏️, Piano 🎹, Pin 📌, Plate 🍽️, Purse 👛, Paper 📄, Paint Brush 🖌️, Parcel 📦',
+					clothes: 'Pants 👖',
+					jobs: 'Police 👮, Postman 📮',
+					business: 'Park 🏞️',
+					nature: 'Planet 🪐'
+				},
+				Q: {
+					things: 'Quill 🪶'
+				},
+				R: {
+					animals: 'Raccoon 🦝',
+					vehicles: 'Race Car 🏎️',
+					things: 'Radio 📻, Ring 💍, Ruler 📏, Racket 🏸, Robot 🤖, Rope 🪢',
+					nature: 'Rose 🌹'
+				},
+				S: {
+					fruits: 'Star Fruit ⭐',
+					animals: 'Shark 🦈, Seal 🦭, Spider 🕷️, Scorpion 🦂, Sloth 🦥, Skunk 🦨, Squid 🦑',
+					birds: 'Sparrow 🐦, Stork 🐦, Seagull 🐦',
+					food: 'Sushi 🍣, Sausage 🌭, Spaghetti 🍝, Sugar 🍬, Salt 🧂',
+					things: 'Scissors ✂️, Soap 🧼, Spoon 🥄, Sofa 🛋️, Saw 🪚, Sponge 🧽, Shower 🚿, Stethoscope 🩺',
+					clothes: 'Shirt 👕, Shoes 👟, Socks 🧦, Scarf 🧣, Sandals 👡, Saree 🥻, Shorts 🩳, Sunglasses 🕶️, Swimsuit 🩱',
+					colors: 'Scarlet 🔴, Sky Blue 🔵',
+					jobs: 'Sailor ⚓',
+					business: 'School 🏫, Station 🚉',
+					body: 'Skull 💀',
+					nature: 'Sunflower 🌻, Sunrise 🌅, Sunset 🌇, Seed 🌱'
+				},
+				T: {
+					fruits: 'Tamarind 🟤',
+					birds: 'Toucan 🐦',
+					food: 'Tea 🍵',
+					things: 'Table 🪑, Telescope 🔭, Television 📺, Toothbrush 🪥, Tent ⛺, Toolbox 🧰, Ticket 🎫, Trophy 🏆, Teddy Bear 🧸, Torch 🔦',
+					clothes: 'T-shirt 👕, Tie 👔, Trousers 👖',
+					business: 'Temple 🛕',
+					nature: 'Tornado 🌪️, Tulip 🌷'
+				},
+				U: {
+					clothes: 'Underwear 🩲'
+				},
+				V: {
+					things: 'Vase 🏺, Violin 🎻, Volleyball 🏐',
+					clothes: 'Vest 🦺',
+					business: 'Village 🏘️'
+				},
+				W: {
+					animals: 'Worm 🪱',
+					birds: 'Woodpecker 🐦',
+					food: 'Walnut 🌰',
+					things: 'Watch ⌚, Wheel 🛞, Window 🪟, Wand 🪄, Wrench 🔧',
+					family: 'Woman 👩',
+					nature: 'Wood 🪵'
+				},
+				X: {
+					things: 'Xylophone 🎶'
+				},
+				Y: {
+					vegetables: 'Yam 🍠',
+					things: 'Yo-yo 🪀, Yarn 🧶'
+				},
+				Z: {
+					things: 'Zipper 🤐'
+				}
+			};
+			for (const L in EXTRA) {
+				for (const key in EXTRA[L]) {
+					const list = DATA[L][key] || (DATA[L][key] = []);
+					const have = new Set(list.map(w => w[0].toLowerCase()));
+					EXTRA[L][key].split(', ').forEach(tok => {
+						const sp = tok.lastIndexOf(' ');
+						const word = tok.slice(0, sp);
+						if (!have.has(word.toLowerCase())) list.push([word, tok.slice(sp + 1)]);
+					});
+				}
+			}
+
 			const CATS = [
 				{ key: 'fruits', label: 'Fruits', icon: '🍎', color: '#FFD3D3' },
 				{ key: 'vegetables', label: 'Vegetables', icon: '🥕', color: '#D6F5D6' },
@@ -2316,6 +2701,8 @@
 				{ key: 'jobs', label: 'Jobs & Professions', icon: '👩‍⚕️', color: '#D6E9FF' },
 				{ key: 'business', label: 'Shops & Places', icon: '🏬', color: '#EAD9C2' },
 				{ key: 'religion', label: 'Religions', icon: '🙏', color: '#E3DCFB' },
+				{ key: 'things', label: 'Everyday Things', icon: '🧸', color: '#E6DCF7' },
+				{ key: 'clothes', label: 'Clothes', icon: '👕', color: '#FFD9EC' },
 				{ key: 'body', label: 'My Body', icon: '🦶', color: '#FFE2CF' },
 				{ key: 'nature', label: 'Nature & Weather', icon: '🌈', color: '#DBF5E3' }
 			];
@@ -2375,9 +2762,28 @@
 				'Ugli Fruit': 'https://upload.wikimedia.org/wikipedia/commons/0/07/Uniq_Fruit_from_Jamaica.jpg',
 				Yuzu: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Yuzu_oranges_%286459456959%29.jpg/330px-Yuzu_oranges_%286459456959%29.jpg'
 			};
+			/* Photos fetched from Wikipedia by tools/fetch_photos.mjs; hand-picked IMG entries win. */
+			Object.entries(window.ABC_PHOTOS || {}).forEach(([w, u]) => {
+				if (!(w in IMG)) IMG[w] = u;
+			});
+			const store = {
+				get(k) {
+					try {
+						return localStorage.getItem(k);
+					} catch (e) {
+						return null;
+					}
+				},
+				set(k, v) {
+					try {
+						localStorage.setItem(k, v);
+					} catch (e) {}
+				}
+			};
+			let photosOn = store.get('abc.photos') !== '0';
 			/* Renders a real photo when one exists for the word, otherwise the emoji. */
 			function pictureHTML(item, cls) {
-				const url = IMG[item.word];
+				const url = photosOn && !SYMBOLIC.has(item.catKey) && IMG[item.word];
 				if (!url) return emojiImg(item.emoji, cls);
 				return `<img class="pic-img ${cls || ''}" src="${url}" alt="${item.word}" data-e="${item.emoji}" draggable="false" loading="lazy" onerror="this.outerHTML=this.dataset.e" />`;
 			}
@@ -2411,6 +2817,7 @@
 				{ label: 'Food & Yum', icon: '🍎', cats: ['fruits', 'vegetables', 'food'] },
 				{ label: 'Animal Kingdom', icon: '🐾', cats: ['animals', 'birds', 'body'] },
 				{ label: 'On the Move', icon: '🚗', cats: ['vehicles', 'directions'] },
+				{ label: 'Home & Wear', icon: '🏠', cats: ['things', 'clothes'] },
 				{ label: 'People & Places', icon: '👪', cats: ['family', 'jobs', 'business', 'festivals', 'religion'] },
 				{ label: 'Colours & Shapes', icon: '🎨', cats: ['colors', 'shapes'] },
 				{ label: 'Our Big World', icon: '🌍', cats: ['nature'] }
@@ -2462,8 +2869,19 @@
 				letterCaption.textContent = activeCats.length + (activeCats.length === 1 ? ' category' : ' categories');
 
 				contentEl.innerHTML = '';
+				const mixTile = document.createElement('button');
+				mixTile.className = 'cat-tile';
+				mixTile.innerHTML = `
+      <span class="pill" style="background:#EAD9FF">${emojiImg('🎲')}</span>
+      <span class="info">
+        <div class="label">Word Mix</div>
+        <div class="sub">Random words starting with ${L}</div>
+      </span>
+      <span class="chev">›</span>`;
+				mixTile.addEventListener('click', () => openMix(currentIndex));
+				contentEl.appendChild(mixTile);
 				if (activeCats.length === 0) {
-					contentEl.innerHTML = '<p class="empty-msg">No words yet for this letter. Try another! 🙂</p>';
+					contentEl.insertAdjacentHTML('beforeend', '<p class="empty-msg">No words yet for this letter. Try another! 🙂</p>');
 					return;
 				}
 				activeCats.forEach(cat => {
@@ -2521,6 +2939,8 @@
 					business: '#B08968',
 					religion: '#9D8DF1',
 					body: '#FF9B6A',
+					things: '#8E7CC3',
+					clothes: '#E667A8',
 					nature: '#4ECB8C'
 				};
 				return accents[key] || '#4D96FF';
@@ -2985,6 +3405,293 @@
 			});
 			document.getElementById('quizReplayBtn').addEventListener('click', () => quizTarget && speak(quizTarget.word));
 			document.getElementById('quizTargetHear').addEventListener('click', () => quizTarget && speak(quizTarget.word));
+
+			/* ================= REAL PHOTOS TOGGLE ================= */
+			function setPhotos(on) {
+				photosOn = on;
+				store.set('abc.photos', on ? '1' : '0');
+				document.querySelectorAll('.photos-toggle').forEach(c => (c.checked = on));
+				if (categoryScreen.style.display === 'block') renderCategory();
+				if (mixScreen.style.display === 'block') renderMix();
+				if (viewer.classList.contains('open')) renderFlashcard(currentDeck[globalIndex]);
+				if (searchResults.classList.contains('show')) runSearch();
+			}
+			document.addEventListener('change', e => {
+				if (e.target.classList.contains('photos-toggle')) setPhotos(e.target.checked);
+			});
+			document.querySelectorAll('.photos-toggle').forEach(c => (c.checked = photosOn));
+
+			/* ================= WORD MIX: one letter, randomized words =================
+   Randomness is controllable:
+   - Seed: same seed + same settings = same words (type any number or word).
+   - Mix categories evenly: round-robin across topics so one topic can't dominate.
+   - No repeats: words already shown for this letter are skipped until all were seen.
+   - Words count, topic filter, and random vs A-Z order. */
+			const mixScreen = document.getElementById('mix-screen');
+			const mixContent = document.getElementById('mixContent');
+			const MIX_COUNTS = [4, 6, 8, 12, 0]; // 0 = all
+			const mixSaved = JSON.parse(store.get('abc.mix') || '{}');
+			const mix = {
+				li: 0,
+				count: MIX_COUNTS.includes(mixSaved.count) ? mixSaved.count : 8,
+				order: mixSaved.order === 'az' ? 'az' : 'random',
+				balanced: mixSaved.balanced !== false,
+				fresh: mixSaved.fresh !== false,
+				cats: new Set(),
+				seed: 0,
+				deck: [],
+				panelOpen: false
+			};
+			function saveMix() {
+				store.set('abc.mix', JSON.stringify({ count: mix.count, order: mix.order, balanced: mix.balanced, fresh: mix.fresh }));
+			}
+
+			function makeRng(seed) {
+				let a = seed >>> 0;
+				return () => {
+					a = (a + 0x6d2b79f5) >>> 0;
+					let t = a;
+					t = Math.imul(t ^ (t >>> 15), t | 1);
+					t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+					return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+				};
+			}
+			function seedFromText(s) {
+				if (/^\d+$/.test(s)) return parseInt(s, 10) >>> 0;
+				let h = 2166136261;
+				for (const ch of s.toLowerCase()) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
+				return h >>> 0;
+			}
+			function seededShuffle(arr, rand) {
+				const a = arr.slice();
+				for (let i = a.length - 1; i > 0; i--) {
+					const j = Math.floor(rand() * (i + 1));
+					[a[i], a[j]] = [a[j], a[i]];
+				}
+				return a;
+			}
+
+			function mixLetterItems() {
+				const L = LETTERS[mix.li];
+				const seen = new Set();
+				return MASTER.filter(it => {
+					if (it.letter !== L) return false;
+					const k = it.word.toLowerCase();
+					if (seen.has(k)) return false;
+					seen.add(k);
+					return true;
+				});
+			}
+			function mixPool() {
+				return mixLetterItems().filter(it => !mix.cats.size || mix.cats.has(it.catKey));
+			}
+			function mixChoose(list, n, rand) {
+				const shuffled = seededShuffle(list, rand);
+				if (!mix.balanced) return shuffled.slice(0, n);
+				const groups = {};
+				shuffled.forEach(it => (groups[it.catKey] = groups[it.catKey] || []).push(it));
+				const keys = seededShuffle(Object.keys(groups), rand);
+				const out = [];
+				while (out.length < n) {
+					let took = false;
+					for (const k of keys) {
+						if (out.length < n && groups[k].length) {
+							out.push(groups[k].shift());
+							took = true;
+						}
+					}
+					if (!took) break;
+				}
+				return out;
+			}
+			/* useHistory = true only for the Shuffle button, so settings changes and typed seeds stay reproducible. */
+			function pickMix(useHistory) {
+				const rand = makeRng(mix.seed);
+				const pool = mixPool();
+				const n = mix.count ? Math.min(mix.count, pool.length) : pool.length;
+				let chosen;
+				if (useHistory && mix.fresh) {
+					const hkey = 'abc.mixSeen.' + LETTERS[mix.li];
+					let seen = JSON.parse(store.get(hkey) || '[]');
+					const unseen = pool.filter(it => !seen.includes(it.word));
+					if (unseen.length >= n) {
+						chosen = mixChoose(unseen, n, rand);
+						seen = seen.concat(chosen.map(it => it.word));
+					} else {
+						const rest = pool.filter(it => !unseen.includes(it));
+						const topUp = mixChoose(rest, n - unseen.length, rand);
+						chosen = unseen.concat(topUp);
+						seen = topUp.map(it => it.word);
+					}
+					store.set(hkey, JSON.stringify(seen));
+				} else {
+					chosen = mixChoose(pool, n, rand);
+				}
+				mix.deck = mix.order === 'az' ? chosen.sort((a, b) => a.word.localeCompare(b.word)) : seededShuffle(chosen, rand);
+			}
+			function newMixSeed() {
+				mix.seed = Math.floor(Math.random() * 90000) + 10000;
+			}
+
+			function openMix(i) {
+				mix.li = i;
+				homeScreen.style.display = 'none';
+				letterScreen.style.display = 'none';
+				mixScreen.style.display = 'block';
+				newMixSeed();
+				pickMix(true);
+				renderMix();
+				window.scrollTo(0, 0);
+			}
+
+			function renderMix() {
+				const L = LETTERS[mix.li];
+				const color = PALETTE[mix.li % PALETTE.length];
+				document.getElementById('mixTopbar').style.background = `linear-gradient(135deg, ${color}, ${shade(color)})`;
+				const big = document.getElementById('mixBigLetter');
+				big.textContent = L;
+				big.style.setProperty('--letter-color', color);
+
+				const letterItems = mixLetterItems();
+				const available = CATS.filter(c => letterItems.some(it => it.catKey === c.key));
+				const pool = mixPool();
+				const strip = LETTERS.map(l => {
+					const i = LETTERS.indexOf(l);
+					return `<button class="mx-letter ${i === mix.li ? 'on' : ''}" data-act="letter" data-i="${i}" style="--letter-color:${color}">${l}</button>`;
+				}).join('');
+				const seg = (act, items, cur) =>
+					`<span class="mx-seg">${items.map(([v, label]) => `<button class="${String(cur) === String(v) ? 'on' : ''}" data-act="${act}" data-v="${v}">${label}</button>`).join('')}</span>`;
+				const chips =
+					`<button class="mx-chip ${mix.cats.size ? '' : 'on'}" data-act="cat" data-v="">All</button>` +
+					available.map(c => `<button class="mx-chip ${mix.cats.has(c.key) ? 'on' : ''}" data-act="cat" data-v="${c.key}">${emojiImg(c.icon)} ${c.label}</button>`).join('');
+				const cards = mix.deck
+					.map((it, idx) => {
+						const rest = [...it.word].slice(1).join('');
+						return `<button class="word-card" data-act="card" data-i="${idx}">
+        <span class="wc-letter" style="background:${catAccent(it.catKey)}">${emojiImg(it.catIcon)}</span>
+        <span class="wc-img">${pictureHTML(it)}</span>
+        <span class="wc-word"><b style="color:${color}">${escapeHtml([...it.word][0])}</b>${escapeHtml(rest)}</span>
+      </button>`;
+					})
+					.join('');
+
+				mixContent.innerHTML = `
+    <div class="mx-strip" id="mixStrip">${strip}</div>
+    <div class="mx-actions">
+      <button class="shuffle" data-act="shuffle">🎲 Shuffle</button>
+      <button class="play" data-act="play">▶️ Play these</button>
+    </div>
+    <details class="mx-panel" id="mixPanel" ${mix.panelOpen ? 'open' : ''}>
+      <summary>⚙️ Shuffle settings</summary>
+      <div class="mx-row"><span class="mx-label">Words</span>${seg(
+				'count',
+				MIX_COUNTS.map(c => [c, c || 'All']),
+				mix.count
+			)}</div>
+      <div class="mx-row"><span class="mx-label">Order</span>${seg(
+				'order',
+				[
+					['random', '🔀 Random'],
+					['az', '🔤 A–Z']
+				],
+				mix.order
+			)}</div>
+      <div class="mx-row">
+        <label class="mx-switch"><input type="checkbox" data-opt="balanced" ${mix.balanced ? 'checked' : ''} /> Mix topics evenly</label>
+        <label class="mx-switch"><input type="checkbox" data-opt="fresh" ${mix.fresh ? 'checked' : ''} /> No repeats until all seen</label>
+        <label class="mx-switch"><input type="checkbox" class="photos-toggle" ${photosOn ? 'checked' : ''} /> 📷 Real photos</label>
+      </div>
+      <div class="mx-row"><span class="mx-label">Topics</span><div class="mx-chips">${chips}</div></div>
+      <div class="mx-row"><span class="mx-label">Seed</span><input class="mx-seed" id="mixSeed" type="text" value="${mix.seed}" aria-label="Shuffle seed" /><button class="mx-go" data-act="seedgo">Go</button><span class="mx-hint">Same seed = same words (turn off “No repeats” when replaying a Shuffle)</span></div>
+    </details>
+    <div class="sr-count">${mix.deck.length} of ${pool.length} “${L}” word${pool.length === 1 ? '' : 's'}</div>
+    ${mix.deck.length ? `<div class="word-grid">${cards}</div>` : '<p class="empty-msg">No words for these topics with this letter. Try another topic or letter! 🙂</p>'}`;
+				document.getElementById('mixPanel').addEventListener('toggle', e => (mix.panelOpen = e.target.open));
+				const on = mixContent.querySelector('.mx-letter.on');
+				if (on) document.getElementById('mixStrip').scrollLeft = on.offsetLeft - 120;
+			}
+
+			function mixRefresh() {
+				saveMix();
+				pickMix(false);
+				renderMix();
+			}
+			mixContent.addEventListener('click', e => {
+				const t = e.target.closest('[data-act]');
+				if (!t || t.tagName !== 'BUTTON') return;
+				const v = t.dataset.v;
+				switch (t.dataset.act) {
+					case 'letter':
+						mix.li = +t.dataset.i;
+						newMixSeed();
+						pickMix(true);
+						renderMix();
+						break;
+					case 'shuffle':
+						newMixSeed();
+						pickMix(true);
+						renderMix();
+						break;
+					case 'play':
+						if (mix.deck.length) openViewer(mix.deck, 0);
+						break;
+					case 'count':
+						mix.count = +v;
+						mixRefresh();
+						break;
+					case 'order':
+						mix.order = v;
+						mixRefresh();
+						break;
+					case 'cat':
+						if (!v) mix.cats.clear();
+						else if (mix.cats.has(v)) mix.cats.delete(v);
+						else mix.cats.add(v);
+						mixRefresh();
+						break;
+					case 'seedgo':
+						applyMixSeed();
+						break;
+					case 'card':
+						openViewer(mix.deck, +t.dataset.i);
+						break;
+				}
+			});
+			function applyMixSeed() {
+				const s = document.getElementById('mixSeed').value.trim();
+				if (!s) return;
+				mix.seed = seedFromText(s);
+				pickMix(false);
+				renderMix();
+				document.getElementById('mixSeed').value = s;
+			}
+			mixContent.addEventListener('change', e => {
+				const opt = e.target.dataset.opt;
+				if (!opt) return;
+				mix[opt] = e.target.checked;
+				mixRefresh();
+			});
+			mixContent.addEventListener('keydown', e => {
+				if (e.key === 'Enter' && e.target.id === 'mixSeed') applyMixSeed();
+			});
+
+			function mixStep(d) {
+				mix.li = (mix.li + d + LETTERS.length) % LETTERS.length;
+				newMixSeed();
+				pickMix(true);
+				renderMix();
+				window.scrollTo(0, 0);
+			}
+			document.getElementById('mixPrevBtn').addEventListener('click', () => mixStep(-1));
+			document.getElementById('mixNextBtn').addEventListener('click', () => mixStep(1));
+			document.getElementById('mixSoundBtn').addEventListener('click', () => speak(LETTERS[mix.li]));
+			document.getElementById('mixBigLetter').addEventListener('click', () => speak(LETTERS[mix.li]));
+			document.getElementById('mixHomeBtn').addEventListener('click', () => {
+				mixScreen.style.display = 'none';
+				homeScreen.style.display = 'block';
+				window.scrollTo(0, 0);
+			});
+			document.getElementById('openMixBtn').addEventListener('click', () => openMix(0));
 		</script>
 	</body>
 </html>
